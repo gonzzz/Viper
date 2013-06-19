@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Viper.Framework", "Viper.Framework\Viper.Framework.csproj", "{07676433-8C72-4275-B465-280B44068ADA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Viper.Test", "Viper.Test\Viper.Test.csproj", "{40FF34A3-C58E-43E9-870C-97CBC2651E87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{470DA73B-746A-4D5F-A2F7-392B32A5B196}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+		Viper.vsmdi = Viper.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Viper.Console", "Viper.Console\Viper.Console.csproj", "{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Viper.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07676433-8C72-4275-B465-280B44068ADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{07676433-8C72-4275-B465-280B44068ADA}.Release|x86.ActiveCfg = Release|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{40FF34A3-C58E-43E9-870C-97CBC2651E87}.Release|x86.ActiveCfg = Release|Any CPU
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Debug|x86.ActiveCfg = Debug|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Debug|x86.Build.0 = Debug|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Release|Any CPU.ActiveCfg = Release|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Release|x86.ActiveCfg = Release|x86
+		{5BA3361B-B089-40AD-B11A-9E80F4FE38D4}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
