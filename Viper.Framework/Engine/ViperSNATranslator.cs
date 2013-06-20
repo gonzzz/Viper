@@ -80,22 +80,22 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForSystemSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.AC1 ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.AC1 ) )
 			{
 				// Absolute Time Clock - No need of specifiers
 				return new SNATranslated( SNAType.System, SNA.SystemAbsoluteClock );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.C1 ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.C1 ) )
 			{
 				// Relative Time Clock - No need of specifiers
 				return new SNATranslated( SNAType.System, SNA.SystemCurrentClock );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.TG1 ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.TG1 ) )
 			{
 				// Termination Count - No need of specifiers
 				return new SNATranslated( SNAType.System, SNA.SystemTerminationCount );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.RN ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.RN ) )
 			{
 				// Randon Number
 				SNATranslated sna = new SNATranslated( SNAType.System, SNA.SystemRandomNumber );
@@ -117,7 +117,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForBlockSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.W ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.W ) )
 			{
 				// Current Transactions Count
 				SNATranslated sna = new SNATranslated( SNAType.Block, SNA.BlockCurrentTransactionCount );
@@ -128,7 +128,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.N ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.N ) )
 			{
 				// Total Transactions Count
 				SNATranslated sna = new SNATranslated( SNAType.Block, SNA.BlockTotalTransactionCount );
@@ -150,22 +150,22 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForTransactionSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.M1 ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.M1 ) )
 			{
 				// Transaction Total Transit Time - No need of specifiers
 				return new SNATranslated( SNAType.Transaction, SNA.TransactionTotalTransitTime );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.XN1 ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.XN1 ) )
 			{
 				// Active Transaction Number - No need of specifiers
 				return new SNATranslated( SNAType.Transaction, SNA.ActiveTransactionNumber );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.PR ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.PR ) )
 			{
 				// Transaction Priority
 				return new SNATranslated( SNAType.Transaction, SNA.TransactionPriority );
 			}
-			else if( parameter.StartsWith( SNAPrefixes.P ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.P ) )
 			{
 				// Transaction Parameter
 				SNATranslated sna = new SNATranslated( SNAType.Transaction, SNA.TransactionParameter );
@@ -176,7 +176,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.P_indirect ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.P_indirect ) )
 			{
 				// Transaction Parameter
 				SNATranslated sna = new SNATranslated( SNAType.Transaction, SNA.TransactionParameter );
@@ -187,7 +187,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.MP ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.MP ) )
 			{
 				// Transaction Transite time minus parameter value content
 				SNATranslated sna = new SNATranslated( SNAType.Transaction, SNA.TransactionTransitTimeRelativeToParameter );
@@ -198,7 +198,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.MB ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.MB ) )
 			{
 				// Transaction Match at Block
 				SNATranslated sna = new SNATranslated( SNAType.Transaction, SNA.TransactionMatchAtBlock );
@@ -220,7 +220,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForStorageSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.R ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.R ) )
 			{
 				// Storage Total Units
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageTotalUnits );
@@ -231,7 +231,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}		
-			else if( parameter.StartsWith( SNAPrefixes.SA ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SA ) )
 			{
 				// Storage Average Usage
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageAverageUse );
@@ -242,7 +242,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SC ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SC ) )
 			{
 				// Storage Entries Count
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageEntriesCount );
@@ -253,7 +253,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SE ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SE ) )
 			{
 				// Storage is Empty
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageIsEmpty );
@@ -264,7 +264,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SF ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SF ) )
 			{
 				// Storage is Full
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageIsFull );
@@ -275,7 +275,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SR ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SR ) )
 			{
 				// Storage Utilization Ratio
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageUtilizationRatio );
@@ -286,7 +286,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SM ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SM ) )
 			{
 				// Storage Maximus Usage
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageMaximusUsage );
@@ -297,7 +297,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.ST ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.ST ) )
 			{
 				// Storage Average Usage Time
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageAverageUsageTime );
@@ -308,7 +308,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.SV ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SV ) )
 			{
 				// Storage is Available
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageIsAvailable );
@@ -319,7 +319,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.S ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.S ) )
 			{
 				// Storage Total Units
 				SNATranslated sna = new SNATranslated( SNAType.Storage, SNA.StorageAvailableUnits );
@@ -341,7 +341,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForFacilitySNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.FC ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.FC ) )
 			{
 				// Facility Entries Count
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityEntriesCount );
@@ -352,7 +352,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.FI ) )
+			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.FI ) )
 			{
 				// Facility is Preempted
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityIsPreempted );
@@ -363,7 +363,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.FR ) )
+			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.FR ) )
 			{
 				// Facility Utilization Ratio
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityUtilizationRatio );
@@ -374,7 +374,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.FT ) )
+			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.FT ) )
 			{
 				// Facility Average Usage Time
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityAverageOccupationTime );
@@ -385,7 +385,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.FV ) )
+			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.FV ) )
 			{
 				// Facility is Available
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityIsAvailable );
@@ -396,7 +396,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.F ) )
+			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.F ) )
 			{
 				// Facility is Occupied
 				SNATranslated sna = new SNATranslated( SNAType.Facility, SNA.FacilityIsOccupied );
@@ -418,7 +418,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForQueueSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.QA ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QA ) )
 			{
 				// Queue Average Content
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueAverageContent );
@@ -429,7 +429,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.QC ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QC ) )
 			{
 				// Queue Entry Count
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueEntryCount );
@@ -440,7 +440,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}			
-			else if( parameter.StartsWith( SNAPrefixes.QM ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QM ) )
 			{
 				// Queue Maximum Entry Count
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueMaximumEntryCount );
@@ -451,7 +451,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.QT ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QT ) )
 			{
 				// Queue Average Stay Time
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueAverageStayTime );
@@ -462,7 +462,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.QX ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QX ) )
 			{
 				// Queue Average Time Excluding Zero-Content Entries
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueAverageStayTimeExcludingZeroContentEntries );
@@ -473,7 +473,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.QZ ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.QZ ) )
 			{
 				// Queue Entry Count with Zero-Content Entries
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueEntryCountWithZeroContentEntries );
@@ -484,7 +484,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.Q ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.Q ) )
 			{
 				// Queue Current Content
 				SNATranslated sna = new SNATranslated( SNAType.Queue, SNA.QueueActualContent );
@@ -506,7 +506,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForUserChainSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.CA ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.CA ) )
 			{
 				// User Chain Average Content
 				SNATranslated sna = new SNATranslated( SNAType.UserChain, SNA.UserChainAverageContent );
@@ -517,7 +517,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.CC ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.CC ) )
 			{
 				// User Chain Total Count
 				SNATranslated sna = new SNATranslated( SNAType.UserChain, SNA.UserChainTotalCount );
@@ -528,7 +528,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.CH ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.CH ) )
 			{
 				// User Chain Current Count
 				SNATranslated sna = new SNATranslated( SNAType.UserChain, SNA.UserChainCurrentCount );
@@ -539,7 +539,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.CM ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.CM ) )
 			{
 				// User Chain Maximum Count
 				SNATranslated sna = new SNATranslated( SNAType.UserChain, SNA.UserChainMaximumCount );
@@ -550,7 +550,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.CT ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.CT ) )
 			{
 				// User Chain Average Residence Time
 				SNATranslated sna = new SNATranslated( SNAType.UserChain, SNA.UserChainAverageResidenceTime );
@@ -572,7 +572,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForLogicSwitchSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.LS ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.LS ) )
 			{
 				// Logic Switch State Value
 				SNATranslated sna = new SNATranslated( SNAType.LogicSwitch, SNA.LogicSwitchStateValue );
@@ -594,7 +594,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForSaveValueSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.X ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.X ) )
 			{
 				// Save Value Current Value
 				SNATranslated sna = new SNATranslated( SNAType.SaveValue, SNA.SaveValueCurrentValue );
@@ -616,7 +616,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForMatrixSaveValueSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.MX ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.MX ) )
 			{
 				// Matrix Save Value Current Value
 				SNATranslated sna = new SNATranslated( SNAType.MatrixSaveValue, SNA.MatrixSaveValueCurrentValue );
@@ -638,7 +638,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForFunctionSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.FN ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.FN ) )
 			{
 				// Function Evaluation Result
 				SNATranslated sna = new SNATranslated( SNAType.Function, SNA.FunctionEvaluationResult );
@@ -660,7 +660,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForTableSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.TB ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.TB ) )
 			{
 				// Table Average Entries
 				SNATranslated sna = new SNATranslated( SNAType.Table, SNA.TableAverageEntries );
@@ -671,7 +671,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.TC ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.TC ) )
 			{
 				// Table Entry Count
 				SNATranslated sna = new SNATranslated( SNAType.Table, SNA.TableEntryCount );
@@ -682,7 +682,7 @@ namespace Viper.Framework.Engine
 
 				return sna;
 			}
-			else if( parameter.StartsWith( SNAPrefixes.TD ) )
+			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.TD ) )
 			{
 				// Table Standard Deviation of Entries
 				SNATranslated sna = new SNATranslated( SNAType.Table, SNA.TableEntriesStandardDeviation );
@@ -704,7 +704,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForBooleanVariableSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.BV ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.BV ) )
 			{
 				// Boolean Variable Evaluation Result
 				SNATranslated sna = new SNATranslated( SNAType.BVariable, SNA.BooleanVariableResult );
@@ -726,7 +726,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForVariableSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.V ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.V ) )
 			{
 				// Arithmetic/Float Variable Evaluation Result
 				SNATranslated sna = new SNATranslated( SNAType.Variable, SNA.VariableResult );
@@ -748,7 +748,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForNumericGroupSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.GN ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.GN ) )
 			{
 				// Numeric Group Count
 				SNATranslated sna = new SNATranslated( SNAType.NumericGroup, SNA.NumericGroupCount );
@@ -770,7 +770,7 @@ namespace Viper.Framework.Engine
 		/// <returns></returns>
 		private static SNATranslated CheckForTransactionGroupSNA( String parameter )
 		{
-			if( parameter.StartsWith( SNAPrefixes.GT ) )
+			if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.GT ) )
 			{
 				// Transaction Group Count
 				SNATranslated sna = new SNATranslated( SNAType.TransactionGroup, SNA.TransactionGroupCount );
@@ -1069,6 +1069,52 @@ namespace Viper.Framework.Engine
 			Regex regEx = new Regex( Constants.REGEX_VALID_POSITIVE_INTEGER );
 
 			return regEx.IsMatch( expression );
+		}
+		#endregion
+
+		#region StartWithSNA
+		public static bool StartsWithSNAPrefix( String expression, String prefix )
+		{
+			
+			if( prefix.Equals( SNAPrefixes.P_indirect ) ) 
+			{
+				// First Special Case for Parameter Indirect SNA Addressing
+				
+				if ( expression.StartsWith( prefix ) ) return true;
+			} 
+			else if ( prefix.Equals( SNAPrefixes.MX ) )
+			{
+				// Second Special Case for Matrix Save Values SNA
+				
+				String strToCompareWithSeparatorToken = String.Format( "{0}{1}" , prefix , Constants.SNA_TOKEN_SEPARATOR );
+				if ( expression.StartsWith( strToCompareWithSeparatorToken ) ) return true;
+
+				String strToCompareWithIndirectAddressingToken = String.Empty;
+				strToCompareWithIndirectAddressingToken = String.Format( "{0}{1}" ,
+																		 prefix , Constants.INDIRECT_ADDRESSING_TOKEN );
+				if ( expression.StartsWith( strToCompareWithIndirectAddressingToken ) ) return true;
+
+				String strToCompareWithPositiveInteger = String.Format( "^{0}{1}" , prefix , Constants.REGEX_VALID_SNA_WITH_POS_INTEGER_SUFIX );
+				Regex regEx = new Regex( strToCompareWithPositiveInteger );
+				if( regEx.IsMatch( expression ) ) return true;
+			} 
+			else 
+			{
+				// Rest of SNA run through here...
+
+				String strToCompareWithSeparatorToken = String.Format( "{0}{1}" , prefix , Constants.SNA_TOKEN_SEPARATOR );
+				if( expression.StartsWith( strToCompareWithSeparatorToken ) ) return true;
+
+				String strToCompareWithIndirectAddressingToken = String.Empty;
+				strToCompareWithIndirectAddressingToken = String.Format( "{0}{1}" , 
+																		 prefix , Constants.INDIRECT_ADDRESSING_TOKEN );		
+				if ( expression.StartsWith( strToCompareWithIndirectAddressingToken ) ) return true;
+
+				String strToCompareWithPositiveInteger = String.Format( "^{0}{1}$" , prefix , Constants.REGEX_VALID_SNA_WITH_POS_INTEGER_SUFIX );
+				Regex regEx = new Regex( strToCompareWithPositiveInteger );
+				if( regEx.IsMatch( expression ) ) return true;
+			}
+			return false;
 		}
 		#endregion
 	}

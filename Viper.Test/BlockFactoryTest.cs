@@ -225,7 +225,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oTerminate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "FIN", oTerminate.Label );
-			Assert.AreEqual( "1", oTerminate.OperandA );
+			Assert.IsTrue( oTerminate.OperandA.IsPosInteger );
+			Assert.AreEqual( 1, oTerminate.OperandA.PosInteger );
 		}
 
 		[TestMethod]
@@ -237,7 +238,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oTerminate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "FIN", oTerminate.Label );
-			Assert.AreEqual( "", oTerminate.OperandA );
+			Assert.IsNull( oTerminate.OperandA );
 		}
 
 		[TestMethod]
@@ -249,7 +250,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oTerminate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oTerminate.Label );
-			Assert.AreEqual( "1", oTerminate.OperandA );
+			Assert.IsTrue( oTerminate.OperandA.IsPosInteger );
+			Assert.AreEqual( 1, oTerminate.OperandA.PosInteger );
 		}
 
 		[TestMethod]
@@ -261,13 +263,13 @@ namespace Viper.Test
 
 			Assert.IsTrue( oTerminate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oTerminate.Label );
-			Assert.AreEqual( "", oTerminate.OperandA );
+			Assert.IsNull( oTerminate.OperandA );
 		}
 		#endregion
 
 		#region Storage Block Tests
 		[TestMethod]
-		public void TestStorageBlockParseWithLabelAndOperandA()
+		public void TestStorageBlockParseWithLabelAndPosIntegerOperandA()
 		{
 			String sStoragePlainTextBlock = "SALON	STORAGE 10";
 
@@ -275,7 +277,21 @@ namespace Viper.Test
 
 			Assert.IsTrue( oStorage.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "SALON", oStorage.Label );
-			Assert.AreEqual( "10", oStorage.OperandA );
+			Assert.IsTrue( oStorage.OperandA.IsPosInteger );
+			Assert.AreEqual( 10, oStorage.OperandA.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestStorageBlockParseWithLabelAndNameOperandA()
+		{
+			String sStoragePlainTextBlock = "SALON	STORAGE FULLSTORAGE";
+
+			StorageBlock oStorage = new StorageBlock( 3 , 3 , sStoragePlainTextBlock );
+
+			Assert.IsTrue( oStorage.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "SALON" , oStorage.Label );
+			Assert.IsTrue( oStorage.OperandA.IsName );
+			Assert.AreEqual( "FULLSTORAGE" , oStorage.OperandA.Name );
 		}
 		#endregion
 
@@ -289,8 +305,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ADENTRO", oEnter.Label );
-			Assert.AreEqual( "SALON", oEnter.OperandA );
-			Assert.AreEqual( "", oEnter.OperandB );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB == null );
+			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -302,8 +318,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ADENTRO", oEnter.Label );
-			Assert.AreEqual( "SALON", oEnter.OperandA );
-			Assert.AreEqual( "2", oEnter.OperandB );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB.IsPosInteger );
+			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
+			Assert.AreEqual( 2, oEnter.OperandB.PosInteger );
 		}
 
 		[TestMethod]
@@ -315,8 +332,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oEnter.Label );
-			Assert.AreEqual( "SALON", oEnter.OperandA );
-			Assert.AreEqual( "", oEnter.OperandB );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB == null );
+			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -328,8 +345,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oEnter.Label );
-			Assert.AreEqual( "SALON", oEnter.OperandA );
-			Assert.AreEqual( "2", oEnter.OperandB );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB.IsPosInteger );
+			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
+			Assert.AreEqual( 2, oEnter.OperandB.PosInteger );
 		}
 		#endregion
 
@@ -343,8 +361,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "SALIR", oLeave.Label );
-			Assert.AreEqual( "SALON", oLeave.OperandA );
-			Assert.AreEqual( "", oLeave.OperandB );
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB == null);
+			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -356,8 +374,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "SALIR", oLeave.Label );
-			Assert.AreEqual( "SALON", oLeave.OperandA );
-			Assert.AreEqual( "1", oLeave.OperandB );
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB.IsPosInteger );
+			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
+			Assert.AreEqual( 1, oLeave.OperandB.PosInteger );
 		}
 
 		[TestMethod]
@@ -369,8 +388,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oLeave.Label );
-			Assert.AreEqual( "SALON", oLeave.OperandA );
-			Assert.AreEqual( "", oLeave.OperandB );
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB == null );
+			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -382,14 +401,15 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oLeave.Label );
-			Assert.AreEqual( "SALON", oLeave.OperandA );
-			Assert.AreEqual( "1", oLeave.OperandB );
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB.IsPosInteger );
+			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
+			Assert.AreEqual( 1, oLeave.OperandB.PosInteger );
 		}
 		#endregion
 
 		#region Seize Block Tests
 		[TestMethod]
-		public void TestSeizeBlockParseWithLabelAndOperandA()
+		public void TestSeizeBlockParseWithLabelAndNameOperandA()
 		{
 			String sSeizePlainTextBlock = "PREGUNTAR	SEIZE	SECRETARIO";
 
@@ -397,37 +417,94 @@ namespace Viper.Test
 
 			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "PREGUNTAR", oSeize.Label );
-			Assert.AreEqual( "SECRETARIO", oSeize.OperandA );
+			Assert.IsTrue( oSeize.OperandA.IsName );
+			Assert.AreEqual( "SECRETARIO", oSeize.OperandA.Name );
 		}
 
 		[TestMethod]
-		public void TestSeizeBlockParseWithNoLabelAndOperandA()
+		public void TestSeizeBlockParseWithNoLabelAndNameOperandA()
 		{
-			String sEnterPlainTextBlock = "	SEIZE	SECRETARIO";
+			String sSeizePlainTextBlock = "	SEIZE	SECRETARIO";
 
-			SeizeBlock oEnter = new SeizeBlock( 7, 7, sEnterPlainTextBlock );
+			SeizeBlock oSeize = new SeizeBlock( 7 , 7 , sSeizePlainTextBlock );
 
-			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
-			Assert.AreEqual( "", oEnter.Label );
-			Assert.AreEqual( "SECRETARIO", oEnter.OperandA );
+			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "" , oSeize.Label );
+			Assert.IsTrue( oSeize.OperandA.IsName );
+			Assert.AreEqual( "SECRETARIO" , oSeize.OperandA.Name );
+		}
+
+		[TestMethod]
+		public void TestSeizeBlockParseWithLabelAndPosIntegerOperandA()
+		{
+			String sSeizePlainTextBlock = "PREGUNTAR	SEIZE	2";
+
+			SeizeBlock oSeize = new SeizeBlock( 7 , 7 , sSeizePlainTextBlock );
+
+			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "PREGUNTAR" , oSeize.Label );
+			Assert.IsTrue( oSeize.OperandA.IsPosInteger );
+			Assert.AreEqual( 2 , oSeize.OperandA.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestSeizeBlockParseWithNoLabelAndPosIntegerOperandA()
+		{
+			String sSeizePlainTextBlock = "	SEIZE	2";
+
+			SeizeBlock oSeize = new SeizeBlock( 7 , 7 , sSeizePlainTextBlock );
+
+			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "" , oSeize.Label );
+			Assert.IsTrue( oSeize.OperandA.IsPosInteger );
+			Assert.AreEqual( 2 , oSeize.OperandA.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestSeizeBlockParseWithLabelAndIndirectSNAOperandA()
+		{
+			String sSeizePlainTextBlock = "PREGUNTAR	SEIZE	*8";
+
+			SeizeBlock oSeize = new SeizeBlock( 7 , 7 , sSeizePlainTextBlock );
+
+			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "PREGUNTAR" , oSeize.Label );
+			Assert.IsTrue(	oSeize.OperandA.IsSNA && oSeize.OperandA.SNA.Parameter.IndirectAddressing 
+							&& oSeize.OperandA.SNA.Parameter.IsPosInteger );
+			Assert.AreEqual( "8" , oSeize.OperandA.SNA.Parameter.Value );
+		}
+
+		[TestMethod]
+		public void TestSeizeBlockParseWithNoLabelAndIndirectSNAOperandA()
+		{
+			String sSeizePlainTextBlock = "	SEIZE	*8";
+
+			SeizeBlock oSeize = new SeizeBlock( 7 , 7 , sSeizePlainTextBlock );
+
+			Assert.IsTrue( oSeize.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "" , oSeize.Label );
+			Assert.IsTrue(	oSeize.OperandA.IsSNA && oSeize.OperandA.SNA.Parameter.IndirectAddressing 
+							&& oSeize.OperandA.SNA.Parameter.IsPosInteger );
+			Assert.AreEqual( "8" , oSeize.OperandA.SNA.Parameter.Value );
 		}
 		#endregion
 
 		#region Release Block Tests
 		[TestMethod]
-		public void TestReleaseBlockParseWithLabelAndOperandA()
+		public void TestReleaseBlockParseWithLabelAndNameOperandA()
 		{
-			String sReleasePlainTextBlock = "PREGUNTAR	RELEASE	SECRETARIO";
+			String sReleasePlainTextBlock = "DEVOLVER	RELEASE	SECRETARIO";
 
 			ReleaseBlock oRelease = new ReleaseBlock( 10, 10, sReleasePlainTextBlock );
 
 			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
-			Assert.AreEqual( "PREGUNTAR", oRelease.Label );
-			Assert.AreEqual( "SECRETARIO", oRelease.OperandA );
+			Assert.AreEqual( "DEVOLVER", oRelease.Label );
+			Assert.IsTrue( oRelease.OperandA.IsName );
+			Assert.AreEqual( "SECRETARIO", oRelease.OperandA.Name );
 		}
 
 		[TestMethod]
-		public void TestReleaseBlockParseWithNoLabelAndOperandA()
+		public void TestReleaseBlockParseWithNoLabelAndNameOperandA()
 		{
 			String sReleasePlainTextBlock = "	RELEASE	SECRETARIO";
 
@@ -435,7 +512,62 @@ namespace Viper.Test
 
 			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oRelease.Label );
-			Assert.AreEqual( "SECRETARIO", oRelease.OperandA );
+			Assert.IsTrue( oRelease.OperandA.IsName );
+			Assert.AreEqual( "SECRETARIO" , oRelease.OperandA.Name );
+		}
+
+		[TestMethod]
+		public void TestReleaseBlockParseWithLabelAndPosIntegerOperandA()
+		{
+			String sReleasePlainTextBlock = "DEVOLVER	RELEASE	2";
+
+			ReleaseBlock oRelease = new ReleaseBlock( 7 , 7 , sReleasePlainTextBlock );
+
+			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "DEVOLVER" , oRelease.Label );
+			Assert.IsTrue( oRelease.OperandA.IsPosInteger );
+			Assert.AreEqual( 2 , oRelease.OperandA.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestReleaseBlockParseWithNoLabelAndPosIntegerOperandA()
+		{
+			String sReleasePlainTextBlock = "	RELEASE	2";
+
+			ReleaseBlock oRelease = new ReleaseBlock( 7 , 7 , sReleasePlainTextBlock );
+
+			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "" , oRelease.Label );
+			Assert.IsTrue( oRelease.OperandA.IsPosInteger );
+			Assert.AreEqual( 2 , oRelease.OperandA.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestReleaseBlockParseWithLabelAndIndirectSNAOperandA()
+		{
+			String sReleasePlainTextBlock = "DEVOLVER	RELEASE	*8";
+
+			ReleaseBlock oRelease = new ReleaseBlock( 7 , 7 , sReleasePlainTextBlock );
+
+			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "DEVOLVER" , oRelease.Label );
+			Assert.IsTrue( oRelease.OperandA.IsSNA && oRelease.OperandA.SNA.Parameter.IndirectAddressing
+							&& oRelease.OperandA.SNA.Parameter.IsPosInteger );
+			Assert.AreEqual( "8" , oRelease.OperandA.SNA.Parameter.Value );
+		}
+
+		[TestMethod]
+		public void TestReleaseBlockParseWithNoLabelAndIndirectSNAOperandA()
+		{
+			String sReleasePlainTextBlock = "	RELEASE	*8";
+
+			ReleaseBlock oRelease = new ReleaseBlock( 7 , 7 , sReleasePlainTextBlock );
+
+			Assert.IsTrue( oRelease.Parse() == BlockParseResult.PARSED_OK );
+			Assert.AreEqual( "" , oRelease.Label );
+			Assert.IsTrue( oRelease.OperandA.IsSNA && oRelease.OperandA.SNA.Parameter.IndirectAddressing
+							&& oRelease.OperandA.SNA.Parameter.IsPosInteger );
+			Assert.AreEqual( "8" , oRelease.OperandA.SNA.Parameter.Value );
 		}
 		#endregion
 
@@ -449,8 +581,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ENCOLAR", oQueue.Label );
-			Assert.AreEqual( "COLA", oQueue.OperandA );
-			Assert.AreEqual( "", oQueue.OperandB );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB == null );
+			Assert.AreEqual( "COLA", oQueue.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -462,8 +594,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ENCOLAR", oQueue.Label );
-			Assert.AreEqual( "COLA", oQueue.OperandA );
-			Assert.AreEqual( "2", oQueue.OperandB );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB.IsPosInteger );
+			Assert.AreEqual( "COLA", oQueue.OperandA.Name );
+			Assert.AreEqual( 2, oQueue.OperandB.PosInteger );
 		}
 
 		[TestMethod]
@@ -475,8 +608,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oQueue.Label );
-			Assert.AreEqual( "COLA", oQueue.OperandA );
-			Assert.AreEqual( "", oQueue.OperandB );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB == null );
+			Assert.AreEqual( "COLA" , oQueue.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -488,8 +621,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oQueue.Label );
-			Assert.AreEqual( "COLA", oQueue.OperandA );
-			Assert.AreEqual( "2", oQueue.OperandB );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB.IsPosInteger );
+			Assert.AreEqual( "COLA" , oQueue.OperandA.Name );
+			Assert.AreEqual( 2 , oQueue.OperandB.PosInteger );
 		}
 		#endregion
 
@@ -503,8 +637,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "DESENCOLAR", oDepart.Label );
-			Assert.AreEqual( "COLA", oDepart.OperandA );
-			Assert.AreEqual( "", oDepart.OperandB );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB == null );
+			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -516,8 +650,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "DESENCOLAR", oDepart.Label );
-			Assert.AreEqual( "COLA", oDepart.OperandA );
-			Assert.AreEqual( "2", oDepart.OperandB );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB.IsPosInteger );
+			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
+			Assert.AreEqual( 2 , oDepart.OperandB.PosInteger );
 		}
 
 		[TestMethod]
@@ -529,8 +664,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oDepart.Label );
-			Assert.AreEqual( "COLA", oDepart.OperandA );
-			Assert.AreEqual( "", oDepart.OperandB );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB == null );
+			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
 		}
 
 		[TestMethod]
@@ -542,8 +677,9 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oDepart.Label );
-			Assert.AreEqual( "COLA", oDepart.OperandA );
-			Assert.AreEqual( "2", oDepart.OperandB );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB.IsPosInteger );
+			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
+			Assert.AreEqual( 2 , oDepart.OperandB.PosInteger );
 		}
 		#endregion
 

@@ -2893,6 +2893,18 @@ namespace Viper.Test
 
 			Assert.IsTrue( regEx.IsMatch( "P9CLASE10J" ) );
 		}
+
+		[TestMethod]
+		public void TestRegEx_ValidateNotAFacilitySNAButName()
+		{
+			String strToCompare = @"^F[1-9]?[0-9]*$";
+			Regex regEx = new Regex( strToCompare );
+
+			Assert.IsFalse( regEx.IsMatch( "FULL" ) );
+			Assert.IsTrue( regEx.IsMatch( "F255" ) );
+			Assert.IsFalse( regEx.IsMatch( "F1RACING" ) );
+			Assert.IsTrue( regEx.IsMatch( "F5" ) );
+		}
 		#endregion
 	}
 }

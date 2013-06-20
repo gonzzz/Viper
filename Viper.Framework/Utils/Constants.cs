@@ -18,12 +18,12 @@ namespace Viper.Framework.Utils
 		public const int DEFAULT_ZERO_VALUE = 0;
 
 		/// <summary>
-		/// Universal SNA token separator
+		/// Dollar Sign SNA token separator
 		/// </summary>
 		public const String SNA_TOKEN_SEPARATOR = "$";
 
 		/// <summary>
-		/// Transaction indirection token
+		/// Transaction indirection (asterix char) token separator
 		/// </summary>
 		public const String INDIRECT_ADDRESSING_TOKEN = "*";
 
@@ -41,5 +41,15 @@ namespace Viper.Framework.Utils
 		/// Regular Expression to Validate a Positive Integer
 		/// </summary>
 		public const String REGEX_VALID_POSITIVE_INTEGER = @"^([1-9]?[0-9]*)$";
+
+		/// <summary>
+		/// Used together with a SNA Prefix to validate a SNA
+		/// </summary>
+		public const String REGEX_VALID_SNA_WITH_POS_INTEGER_SUFIX = @"[1-9]?[0-9]*";
+
+		/// <summary>
+		/// Used together with a Matrix SaveValue Prefix to validate the SNA
+		/// </summary>
+		public const String REGEX_VALID_SNA_WITH_POS_INTEGER_PLUS_COORDINATES_SUFIX = @"[1-9]?[0-9]*\([a-zA-Z0-9\$\*]\,[a-zA-Z0-9\$\*]\)";
 	}
 }
