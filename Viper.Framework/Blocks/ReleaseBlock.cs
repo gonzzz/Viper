@@ -36,7 +36,7 @@ namespace Viper.Framework.Blocks
 		public ReleaseBlock()
 			: base()
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			this.m_oFacilityEntity = null;
 		}
 
@@ -49,7 +49,7 @@ namespace Viper.Framework.Blocks
 		public ReleaseBlock( int iLineNumber, int iBlockNumber, String sBlockText )
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			this.m_oFacilityEntity = null;
 		}
 		#endregion
@@ -78,7 +78,7 @@ namespace Viper.Framework.Blocks
 				{
 					// FORMATS: RELEASE A
 					m_sBlockLabel = String.Empty;
-					this.OperandA = BlockOperand.TranslateOperand( sBlockParts[ 1 ] );
+					BlockOperand.TranslateOperand( this.OperandA, sBlockParts[ 1 ], true );
 					
 					// Operand A is required
 					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;
@@ -87,7 +87,7 @@ namespace Viper.Framework.Blocks
 				{
 					// FORMATS: NAME RELEASE A
 					m_sBlockLabel = sBlockParts[ 0 ];
-					this.OperandA = BlockOperand.TranslateOperand( sBlockParts[ 2 ] );
+					BlockOperand.TranslateOperand( this.OperandA, sBlockParts[ 2 ] , true );
 					
 					// Operand A is required
 					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;

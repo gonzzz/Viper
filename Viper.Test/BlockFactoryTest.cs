@@ -71,9 +71,9 @@ namespace Viper.Test
 			GenerateBlock oGenerate = new GenerateBlock( 1, 1, sGeneratePlainTextBlock );
 
 			Assert.IsTrue( oGenerate.Parse() == BlockParseResult.PARSED_OK );
-			Assert.IsTrue(	oGenerate.OperandA.HasValidValue && oGenerate.OperandB == null &&
-							oGenerate.OperandC == null && oGenerate.OperandD == null &&
-							oGenerate.OperandE == null );
+			Assert.IsTrue( oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
+							oGenerate.OperandC.HasValidValue && oGenerate.OperandD.HasValidValue &&
+							oGenerate.OperandE.HasValidValue );
 			Assert.AreEqual( 120, oGenerate.OperandA.PosInteger );
 		}
 
@@ -86,8 +86,8 @@ namespace Viper.Test
 
 			Assert.IsTrue( oGenerate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.IsTrue( oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
-							oGenerate.OperandC == null && oGenerate.OperandD == null &&
-							oGenerate.OperandE == null );
+							oGenerate.OperandC.HasValidValue && oGenerate.OperandD.HasValidValue &&
+							oGenerate.OperandE.HasValidValue );
 			Assert.AreEqual( 120, oGenerate.OperandA.PosInteger );
 			Assert.AreEqual( 30, oGenerate.OperandB.PosInteger );
 		}
@@ -100,9 +100,9 @@ namespace Viper.Test
 			GenerateBlock oGenerate = new GenerateBlock( 1, 1, sGeneratePlainTextBlock );
 
 			Assert.IsTrue( oGenerate.Parse() == BlockParseResult.PARSED_OK );
-			Assert.IsTrue(	oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
-							oGenerate.OperandC == null && oGenerate.OperandD == null &&
-							oGenerate.OperandE == null );
+			Assert.IsTrue( oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
+							oGenerate.OperandC.HasValidValue && oGenerate.OperandD.HasValidValue &&
+							oGenerate.OperandE.HasValidValue );
 			Assert.AreEqual( 120, oGenerate.OperandA.PosInteger );
 			Assert.IsTrue( oGenerate.OperandB.SNA.Type == SNAType.Function && oGenerate.OperandB.SNA.Parameter.Value == "FMULT0" );
 		}
@@ -115,9 +115,9 @@ namespace Viper.Test
 			GenerateBlock oGenerate = new GenerateBlock( 1, 1, sGeneratePlainTextBlock );
 
 			Assert.IsTrue( oGenerate.Parse() == BlockParseResult.PARSED_OK );
-			Assert.IsTrue(	oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
-							oGenerate.OperandC.HasValidValue && oGenerate.OperandD == null &&
-							oGenerate.OperandE == null );
+			Assert.IsTrue( oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
+							oGenerate.OperandC.HasValidValue && oGenerate.OperandD.HasValidValue &&
+							oGenerate.OperandE.HasValidValue );
 			Assert.AreEqual( 120, oGenerate.OperandA.PosInteger);
 			Assert.AreEqual( 30, oGenerate.OperandB.PosInteger );
 			Assert.AreEqual( 200, oGenerate.OperandC.PosInteger );
@@ -133,7 +133,7 @@ namespace Viper.Test
 			Assert.IsTrue( oGenerate.Parse() == BlockParseResult.PARSED_OK );
 			Assert.IsTrue(	oGenerate.OperandA.HasValidValue && oGenerate.OperandB.HasValidValue &&
 							oGenerate.OperandC.HasValidValue && oGenerate.OperandD.HasValidValue &&
-							oGenerate.OperandE == null );
+							oGenerate.OperandE.HasValidValue );
 			Assert.AreEqual( 120, oGenerate.OperandA.PosInteger );
 			Assert.AreEqual( 30, oGenerate.OperandB.PosInteger );
 			Assert.AreEqual( 200, oGenerate.OperandC.PosInteger );
@@ -169,7 +169,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oAdvance.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "WALK", oAdvance.Label );
-			Assert.IsTrue( oAdvance.OperandA.IsPosInteger && oAdvance.OperandB == null );
+			Assert.IsTrue( oAdvance.OperandA.IsPosInteger && oAdvance.OperandB.IsEmpty );
 			Assert.AreEqual( 60, oAdvance.OperandA.PosInteger );
 		}
 
@@ -196,7 +196,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oAdvance.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oAdvance.Label );
-			Assert.IsTrue( oAdvance.OperandA.IsPosInteger && oAdvance.OperandB == null );
+			Assert.IsTrue( oAdvance.OperandA.IsPosInteger && oAdvance.OperandB.IsEmpty);
 			Assert.AreEqual( 60, oAdvance.OperandA.PosInteger );
 		}
 
@@ -305,7 +305,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ADENTRO", oEnter.Label );
-			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB == null );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB.IsEmpty );
 			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
 		}
 
@@ -332,7 +332,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oEnter.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oEnter.Label );
-			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB == null );
+			Assert.IsTrue( oEnter.OperandA.IsName && oEnter.OperandB.IsEmpty );
 			Assert.AreEqual( "SALON", oEnter.OperandA.Name );
 		}
 
@@ -361,7 +361,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "SALIR", oLeave.Label );
-			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB == null);
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB.IsEmpty );
 			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
 		}
 
@@ -388,7 +388,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oLeave.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oLeave.Label );
-			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB == null );
+			Assert.IsTrue( oLeave.OperandA.IsName && oLeave.OperandB.IsEmpty );
 			Assert.AreEqual( "SALON", oLeave.OperandA.Name );
 		}
 
@@ -581,7 +581,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "ENCOLAR", oQueue.Label );
-			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB == null );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB.IsEmpty );
 			Assert.AreEqual( "COLA", oQueue.OperandA.Name );
 		}
 
@@ -608,7 +608,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oQueue.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oQueue.Label );
-			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB == null );
+			Assert.IsTrue( oQueue.OperandA.IsName && oQueue.OperandB.IsEmpty );
 			Assert.AreEqual( "COLA" , oQueue.OperandA.Name );
 		}
 
@@ -637,7 +637,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "DESENCOLAR", oDepart.Label );
-			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB == null );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB.IsEmpty );
 			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
 		}
 
@@ -664,7 +664,7 @@ namespace Viper.Test
 
 			Assert.IsTrue( oDepart.Parse() == BlockParseResult.PARSED_OK );
 			Assert.AreEqual( "", oDepart.Label );
-			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB == null );
+			Assert.IsTrue( oDepart.OperandA.IsName && oDepart.OperandB.IsEmpty );
 			Assert.AreEqual( "COLA" , oDepart.OperandA.Name );
 		}
 
@@ -694,7 +694,7 @@ namespace Viper.Test
 
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
 
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
 
 		[TestMethod]
@@ -709,7 +709,7 @@ namespace Viper.Test
 
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
 
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
 
 		[TestMethod]
@@ -724,7 +724,7 @@ namespace Viper.Test
 
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
 
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
 
 		[TestMethod]
@@ -741,7 +741,7 @@ namespace Viper.Test
 
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
 
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
 
 		[TestMethod]
@@ -761,7 +761,7 @@ namespace Viper.Test
 
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
 
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
 		#endregion
 	}

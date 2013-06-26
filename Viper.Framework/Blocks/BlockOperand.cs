@@ -20,6 +20,8 @@ namespace Viper.Framework.Blocks
 		private bool m_bIsSNA;
 		private bool m_bIsName;
 		private bool m_bIsPosInteger;
+		private bool m_bIsRequired;
+		private bool m_bIsEmpty;
 		#endregion
 
 		#region Public Properties
@@ -46,6 +48,7 @@ namespace Viper.Framework.Blocks
 				}
 				m_bIsSNA = true;
 				m_oSNA = value;
+				m_bIsEmpty = false;
 			}
 		}
 
@@ -72,6 +75,7 @@ namespace Viper.Framework.Blocks
 				}
 				m_bIsName = true;
 				m_sName = value;
+				m_bIsEmpty = String.IsNullOrEmpty( value );
 			}
 		}
 
@@ -98,6 +102,7 @@ namespace Viper.Framework.Blocks
 				}
 				m_bIsPosInteger = true;
 				m_iPosInteger = value;
+				m_bIsEmpty = false;
 			}
 		}
 
@@ -141,7 +146,35 @@ namespace Viper.Framework.Blocks
 		{
 			get
 			{
-				return ( m_bIsPosInteger || m_bIsName || m_bIsSNA );
+				// If has a positive integer value, a string or a sna value OR
+				// If it is empty but not required => Operand is Valid
+				return ( m_bIsPosInteger || m_bIsName || m_bIsSNA ) || ( m_bIsEmpty && !m_bIsRequired );
+			}
+		}
+
+		/// <summary>
+		/// Returns true if operand is required, false otherwise.
+		/// </summary>
+		public bool IsRequired
+		{
+			get
+			{
+				return m_bIsRequired;
+			}
+			set
+			{
+				m_bIsRequired = value;
+			}
+		}
+
+		/// <summary>
+		/// Returns if operand is empty, false otherwise
+		/// </summary>
+		public bool IsEmpty
+		{
+			get
+			{
+				return m_bIsEmpty;
 			}
 		}
 		#endregion
@@ -155,36 +188,74 @@ namespace Viper.Framework.Blocks
 			m_bIsName = false;
 			m_bIsPosInteger = false;
 			m_bIsSNA = false;
+			m_bIsRequired = false;
+			m_bIsEmpty = true;
 		}
 		#endregion
+
+		/// <summary>
+		/// Returns a new Empty Block Operand
+		/// </summary>
+		/// <returns></returns>
+		public static BlockOperand EmptyOperand()
+		{
+			return new BlockOperand();
+		}
+
+		/// <summary>
+		/// BlockOperand Creator from String Operand, passing an existent BlockOperand object.
+		/// </summary>
+		/// <param name="blockOperand"></param>
+		/// <param name="operandStr"></param>
+		/// <param name="required"></param>
+		/// <returns></returns>
+		public static BlockOperand TranslateOperand( BlockOperand blockOperand, String operandStr, bool required = false )
+		{
+			blockOperand.IsRequired = required;
+			return ParseOperand( operandStr , blockOperand );
+		}
 
 		/// <summary>
 		/// BlockOperand Creator from String Operand
 		/// </summary>
 		/// <param name="operand"></param>
+		/// <param name="required"></param>
 		/// <returns></returns>
-		public static BlockOperand TranslateOperand( String operand )
+		public static BlockOperand TranslateOperand( String operandStr, bool required = false )
 		{
 			BlockOperand blockOperand = new BlockOperand();
+			blockOperand.IsRequired = required;
+			return ParseOperand( operandStr, blockOperand );
+		}
 
-			SNATranslated sna = ViperSNATranslator.Translate( operand );
-			if( sna != null )
+		/// <summary>
+		/// Private Method that do the parsing
+		/// </summary>
+		/// <param name="operand"></param>
+		/// <param name="blockOperand"></param>
+		/// <returns></returns>
+		private static BlockOperand ParseOperand( String operand , BlockOperand blockOperand )
+		{
+			if ( !String.IsNullOrEmpty( operand ) )
 			{
-				blockOperand.SNA = sna;
-			}
-			else
-			{
-				if( ViperSNATranslator.IsValidPositiveInteger( operand ) )
+				SNATranslated sna = ViperSNATranslator.Translate( operand );
+				if ( sna != null )
 				{
-					int iDummyValue = Constants.DEFAULT_ZERO_VALUE;
-					if( Int32.TryParse( operand, out iDummyValue ) ) blockOperand.PosInteger = iDummyValue;
+					blockOperand.SNA = sna;
 				}
-				else if( ViperSNATranslator.IsValidName( operand ) )
+				else
 				{
-					blockOperand.Name = operand;
+					if ( ViperSNATranslator.IsValidPositiveInteger( operand ) )
+					{
+						int iDummyValue = Constants.DEFAULT_ZERO_VALUE;
+						if ( Int32.TryParse( operand , out iDummyValue ) ) blockOperand.PosInteger = iDummyValue;
+					}
+					else if ( ViperSNATranslator.IsValidName( operand ) )
+					{
+						blockOperand.Name = operand;
+					}
 				}
 			}
-
 			return blockOperand;
 		}
 	}

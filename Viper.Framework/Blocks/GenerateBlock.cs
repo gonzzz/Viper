@@ -68,11 +68,11 @@ namespace Viper.Framework.Blocks
 		public GenerateBlock()
 			: base()
 		{
-			this.OperandA = null;
-			this.OperandB = null;
-			this.OperandC = null;
-			this.OperandD = null;
-			this.OperandE = null;
+			this.OperandA = BlockOperand.EmptyOperand();
+			this.OperandB = BlockOperand.EmptyOperand();
+			this.OperandC = BlockOperand.EmptyOperand();
+			this.OperandD = BlockOperand.EmptyOperand();
+			this.OperandE = BlockOperand.EmptyOperand();
 		}
 
 		/// <summary>
@@ -83,11 +83,11 @@ namespace Viper.Framework.Blocks
 		public GenerateBlock( int iLineNumber, int iBlockNumber, String sBlockText )
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
-			this.OperandA = null;
-			this.OperandB = null;
-			this.OperandC = null;
-			this.OperandD = null;
-			this.OperandE = null;
+			this.OperandA = BlockOperand.EmptyOperand();
+			this.OperandB = BlockOperand.EmptyOperand();
+			this.OperandC = BlockOperand.EmptyOperand();
+			this.OperandD = BlockOperand.EmptyOperand();
+			this.OperandE = BlockOperand.EmptyOperand();
 		}
 		#endregion
 
@@ -119,13 +119,22 @@ namespace Viper.Framework.Blocks
 					// ALL OPERANDS: A,B,C,D,E
 					String[] operands = sBlockParts[ 1 ].Split( ',' );
 
-					if( operands.Length >= 1 ) this.OperandA = BlockOperand.TranslateOperand( operands[ 0 ] );
-					if( operands.Length >= 2 ) this.OperandB = BlockOperand.TranslateOperand( operands[ 1 ] );
-					if( operands.Length >= 3 ) this.OperandC = BlockOperand.TranslateOperand( operands[ 2 ] );
-					if( operands.Length >= 4 ) this.OperandD = BlockOperand.TranslateOperand( operands[ 3 ] );
-					if( operands.Length >= 5 ) this.OperandE = BlockOperand.TranslateOperand( operands[ 4 ] );
+					if( operands.Length == 0 || operands.Length > 5 ) {
+						OnParseFailed( new ParseEventArgs( BlockNames.GENERATE , this.Line , String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
 
-					if( this.OperandA.HasValidValue || this.OperandD.HasValidValue ) return BlockParseResult.PARSED_OK;
+					if( operands.Length >= 1 ) BlockOperand.TranslateOperand( this.OperandA, operands[ 0 ], true );
+					if( operands.Length >= 2 ) BlockOperand.TranslateOperand( this.OperandB, operands[ 1 ] );
+					if( operands.Length >= 3 ) BlockOperand.TranslateOperand( this.OperandC, operands[ 2 ] );
+					if( operands.Length >= 4 ) BlockOperand.TranslateOperand( this.OperandD, operands[ 3 ], true );
+					if( operands.Length >= 5 ) BlockOperand.TranslateOperand( this.OperandE, operands[ 4 ] );
+
+					if( this.OperandA.HasValidValue && this.OperandB.HasValidValue && 
+						this.OperandC.HasValidValue && this.OperandD.HasValidValue && 
+						this.OperandE.HasValidValue ) {
+						return BlockParseResult.PARSED_OK;
+					}
 				}
 
 				OnParseFailed( new ParseEventArgs( BlockNames.GENERATE, this.Line, String.Empty ) );

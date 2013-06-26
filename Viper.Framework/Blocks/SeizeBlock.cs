@@ -36,7 +36,7 @@ namespace Viper.Framework.Blocks
 		public SeizeBlock()
 			: base()
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			m_oFacilityEntity = null;
 		}
 
@@ -49,7 +49,7 @@ namespace Viper.Framework.Blocks
 		public SeizeBlock( int iLineNumber, int iBlockNumber, String sBlockText )
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			m_oFacilityEntity = null;
 		}
 		#endregion
@@ -78,7 +78,7 @@ namespace Viper.Framework.Blocks
 				{
 					// FORMATS: SEIZE A
 					m_sBlockLabel = String.Empty;
-					this.OperandA = BlockOperand.TranslateOperand( sBlockParts[ 1 ] );
+					BlockOperand.TranslateOperand( this.OperandA, sBlockParts[ 1 ], true );
 					
 					// Operand A is required
 					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;
@@ -87,7 +87,7 @@ namespace Viper.Framework.Blocks
 				{
 					// FORMATS: NAME SEIZE A
 					m_sBlockLabel = sBlockParts[ 0 ];
-					this.OperandA = BlockOperand.TranslateOperand( sBlockParts[ 2 ] );
+					BlockOperand.TranslateOperand( this.OperandA , sBlockParts[ 2 ] , true );
 					
 					// Operand A is required
 					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;

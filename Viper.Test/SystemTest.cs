@@ -61,6 +61,45 @@ namespace Viper.Test
 		// public void MyTestCleanup() { }
 		//
 		#endregion
+		[TestMethod]
+		public void TestErrorHandlingInBlockCreationAreCaptured()
+		{
+			// 1) Create basic GPSS Model with a Storage
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "SALON	STORAGE		200" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		GENERATE	120,30" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALON,2,3" , Environment.NewLine ); // Wrong Number of Operands
+			strGPSSModel += String.Concat( "		ADVANCE		*8" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATOR	1" , Environment.NewLine ); // Invalid Block
+
+			// 2) Create Block Model
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+			
+			// 3) Verify it has errors!
+			List<String> strErrors = BlockFactory.Instance().ErrorMessageLog;
+			Assert.IsTrue( strErrors.Count == 2 );
+		}
+
+		[TestMethod]
+		public void TestErrorHandlingInBlockCreationAreCaptured2()
+		{
+			// 1) Create basic GPSS Model with a Storage
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "SALON	STORAGE		200" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		GENERATE	120,30,,,3,BLEH" , Environment.NewLine ); // Wrong Number of Operands
+			strGPSSModel += String.Concat( "		ENTER		SALON" , Environment.NewLine ); 
+			strGPSSModel += String.Concat( "		ADVANCE		*8,FN$2,34,2" , Environment.NewLine ); // Wrong Number of Operands
+			strGPSSModel += String.Concat( "		LEAVE		SALON" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE" ); 
+
+			// 2) Create Block Model
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			// 3) Verify it has errors!
+			List<String> strErrors = BlockFactory.Instance().ErrorMessageLog;
+			Assert.IsTrue( strErrors.Count == 2 );
+		}
 
 		[TestMethod]
 		public void TestNonTransactionalBlocksStorageCreationInSystemModel()
@@ -76,7 +115,7 @@ namespace Viper.Test
 
 			// 2) Create Block Model
 			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
-			Assert.IsTrue( String.IsNullOrEmpty( BlockFactory.Instance().ErrorMessageLog ) );
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 
 			// 3) Create Viper Model with Entities
 			Model oModel = new Model();
@@ -95,8 +134,12 @@ namespace Viper.Test
 
 					// Create new Storage in Model with Storage Block parameters
 					Storage newStorage = new Storage( storageBlock.Label );
-					newStorage.Capacity = Convert.ToInt32( storageBlock.OperandA );
-					newStorage.Available = newStorage.Capacity;
+					if( storageBlock.OperandA.IsPosInteger ) {
+						newStorage.Capacity = storageBlock.OperandA.PosInteger;
+						newStorage.Available = newStorage.Capacity;
+					} else {
+						// Todo: if operandA isName we should search for VARIABLE, FVARIABLE or EQU blocks
+					}
 					oModel.AddStorage( newStorage );
 
 					// Attach Storage Entity to Storage Block

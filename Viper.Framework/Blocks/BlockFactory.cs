@@ -24,7 +24,7 @@ namespace Viper.Framework.Blocks
 		/// </summary>
 		private BlockFactory()
 		{
-			ErrorMessageLog = String.Empty;
+			ErrorMessageLog = new List<string>();
 			CurrentLanguage = Languages.Spanish;
 		}
 
@@ -44,7 +44,7 @@ namespace Viper.Framework.Blocks
 		#endregion
 
 		#region Public Properties
-		public String ErrorMessageLog { get; set; }
+		public List<String> ErrorMessageLog { get; set; }
 		public Languages CurrentLanguage { get; set; }
 		#endregion
 
@@ -59,7 +59,7 @@ namespace Viper.Framework.Blocks
 			List<Block> lbViperModel = new List<Block>();
 			String[] sPlainModelBlocks = sPlainTextModel.Split( new string[] { "\r\n", "\n" }, StringSplitOptions.None );
 
-			ErrorMessageLog = String.Empty;
+			ErrorMessageLog.Clear();
 			int iLineNumber = 0;
 			foreach( String sPlainModelBlock in sPlainModelBlocks )
 			{
@@ -495,7 +495,7 @@ namespace Viper.Framework.Blocks
 			}
 
 			// Add new message error to message log
-			ErrorMessageLog += String.Concat( String.Format( sErrorMessageFormat, sBlockName, iLineNumber ), Environment.NewLine );
+			ErrorMessageLog.Add( String.Format( sErrorMessageFormat, sBlockName, iLineNumber ) );
 		}
 
 		/// <summary>
@@ -516,7 +516,7 @@ namespace Viper.Framework.Blocks
 			}
 
 			// Add new message error to message log
-			ErrorMessageLog += String.Concat( String.Format( sErrorMessageFormat, iLineNumber ), Environment.NewLine );
+			ErrorMessageLog.Add( String.Format( sErrorMessageFormat, iLineNumber ) );
 		}
 
 		/// <summary>
@@ -542,9 +542,9 @@ namespace Viper.Framework.Blocks
 
 			// Add new message error to message log
 			if( String.IsNullOrEmpty( sBlockName ) ) 
-				ErrorMessageLog += String.Concat( String.Format( sErrorMessageFormat, iLineNumber, sMessage ), Environment.NewLine );
+				ErrorMessageLog.Add( String.Format( sErrorMessageFormat, iLineNumber, sMessage ) );
 			else
-				ErrorMessageLog += String.Concat( String.Format( sErrorMessageFormat, sBlockName, iLineNumber, sMessage ), Environment.NewLine );
+				ErrorMessageLog.Add( String.Format( sErrorMessageFormat, sBlockName, iLineNumber, sMessage ) );
 		}
 	}
 }

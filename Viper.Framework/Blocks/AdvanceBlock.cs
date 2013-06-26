@@ -41,8 +41,8 @@ namespace Viper.Framework.Blocks
 		/// </summary>
 		public AdvanceBlock() : base()
 		{
-			this.OperandA = null;
-			this.OperandB = null;
+			this.OperandA = BlockOperand.EmptyOperand();
+			this.OperandB = BlockOperand.EmptyOperand();
 		}
 
 		/// <summary>
@@ -53,8 +53,8 @@ namespace Viper.Framework.Blocks
 		public AdvanceBlock( int iLineNumber, int iBlockNumber, String sBlockText )
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
-			this.OperandA = null;
-			this.OperandB = null;
+			this.OperandA = BlockOperand.EmptyOperand();
+			this.OperandB = BlockOperand.EmptyOperand();
 		}
 		#endregion
 
@@ -87,11 +87,19 @@ namespace Viper.Framework.Blocks
 
 					// ALL OPERANDS: A,B
 					String[] operands = sBlockParts[ 1 ].Split( ',' );
-					if( operands.Length >= 1 ) this.OperandA = BlockOperand.TranslateOperand( operands[ 0 ] );
-					if( operands.Length >= 2 ) this.OperandB = BlockOperand.TranslateOperand( operands[ 1 ] );
 
-					// OPERAND A is REQUIRED
-					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;
+					if ( operands.Length == 0 || operands.Length > 2 )
+					{
+						OnParseFailed( new ParseEventArgs( BlockNames.ADVANCE , this.Line , String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
+
+					if ( operands.Length >= 1 ) BlockOperand.TranslateOperand( this.OperandA , operands[ 0 ] , true );
+					if ( operands.Length >= 2 ) BlockOperand.TranslateOperand( this.OperandB , operands[ 1 ] );
+
+					// Operand A is required, Operand B optional, both have to get valid values
+					if ( this.OperandA.HasValidValue && this.OperandB.HasValidValue )
+						return BlockParseResult.PARSED_OK;
 				}
 				else if( sBlockParts[ 1 ].Equals( BlockNames.ADVANCE ) && sBlockParts.Length == 3 )
 				{
@@ -102,11 +110,19 @@ namespace Viper.Framework.Blocks
 
 					// ALL OPERANDS: A,B
 					String[] operands = sBlockParts[ 2 ].Split( ',' );
-					if( operands.Length >= 1 ) this.OperandA = BlockOperand.TranslateOperand( operands[ 0 ] );
-					if( operands.Length >= 2 ) this.OperandB = BlockOperand.TranslateOperand( operands[ 1 ] );
 
-					// OPERAND A is REQUIRED
-					if( this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;
+					if ( operands.Length == 0 || operands.Length > 2 )
+					{
+						OnParseFailed( new ParseEventArgs( BlockNames.ADVANCE , this.Line , String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
+
+					if( operands.Length >= 1 ) BlockOperand.TranslateOperand( this.OperandA, operands[ 0 ], true );
+					if( operands.Length >= 2 ) BlockOperand.TranslateOperand( this.OperandB, operands[ 1 ] );
+
+					// Operand A is required, Operand B optional, both have to get valid values
+					if ( this.OperandA.HasValidValue && this.OperandB.HasValidValue )
+						return BlockParseResult.PARSED_OK;
 				}
 				
 				OnParseFailed( new ParseEventArgs( BlockNames.ADVANCE, this.Line, String.Empty ) );

@@ -38,7 +38,7 @@ namespace Viper.Framework.Blocks
 		/// </summary>
 		public StorageBlock() : base()
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			m_oStorageEntity = null;
 		}
 
@@ -50,7 +50,7 @@ namespace Viper.Framework.Blocks
 		public StorageBlock( int iLineNumber, int iBlockNumber, String sBlockText )
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
-			this.OperandA = null;
+			this.OperandA = BlockOperand.EmptyOperand();
 			m_oStorageEntity = null;
 		}
 		#endregion
@@ -80,7 +80,16 @@ namespace Viper.Framework.Blocks
 				{
 					// FORMATS: NAME STORAGE A
 					m_sBlockLabel = sBlockParts[ 0 ];
-					this.OperandA = BlockOperand.TranslateOperand( sBlockParts[ 2 ] );
+
+					String[] operands = sBlockParts[ 2 ].Split( ',' );
+
+					if ( operands.Length == 0 || operands.Length > 1 )
+					{
+						OnParseFailed( new ParseEventArgs( BlockNames.STORAGE , this.Line , String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
+
+					BlockOperand.TranslateOperand( this.OperandA, operands[ 0 ], true );
 
 					if( !String.IsNullOrEmpty( m_sBlockLabel ) && this.OperandA.HasValidValue ) return BlockParseResult.PARSED_OK;
 				}

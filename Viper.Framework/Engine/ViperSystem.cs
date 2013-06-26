@@ -23,6 +23,7 @@ namespace Viper.Framework.Engine
 			m_lbSimulationBlocks = null;
 			m_oModel = new Model();
 			m_iTerminationCount = Constants.DEFAULT_ZERO_VALUE;
+			ErrorMessageLog = new List<string>();
 		}
 
 		/// <summary>
@@ -100,21 +101,21 @@ namespace Viper.Framework.Engine
 		/// <summary>
 		/// 
 		/// </summary>
-		public String ErrorMessageLog { get; set; }
+		public List<String> ErrorMessageLog { get; set; }
 		#endregion
 
 		#region Public Methods
 		public bool Simulate( String sPlainTextModel, int iTerminationCount )
 		{
 			// Previous: clean error message log (will be filled with error after parsing the model)
-			ErrorMessageLog = String.Empty;
+			ErrorMessageLog.Clear();
 
 			// 1) Create Viper Model from Plain Text GPSS model	
 			m_lbSimulationBlocks = BlockFactory.Instance().CreateModel( sPlainTextModel );
-			ErrorMessageLog = BlockFactory.Instance().ErrorMessageLog;
+			ErrorMessageLog.AddRange( BlockFactory.Instance().ErrorMessageLog.ToArray() );
 
 			// 2) Check that Viper Model has been created with NO errors
-			if( String.IsNullOrEmpty( ErrorMessageLog ) )
+			if( ErrorMessageLog.Count == 0 )
 			{
 				// 3) Add Entity Objects to Model
 				CreateEntitiesForNonTransactionalBlocks();
