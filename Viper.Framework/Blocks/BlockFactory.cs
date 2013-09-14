@@ -48,6 +48,7 @@ namespace Viper.Framework.Blocks
 		public Languages CurrentLanguage { get; set; }
 		#endregion
 
+		#region Public Methods
 		/// <summary>
 		/// We assume the plain text has one block per line. The method scans line by line, translates each line into a 
 		/// Viper Block and creates a new Block Object.
@@ -133,7 +134,9 @@ namespace Viper.Framework.Blocks
 
 			return sBlockParts;
 		}
+		#endregion
 
+		#region Private Methods
 		/// <summary>
 		/// Tries to Parse a GENERATE Block
 		/// </summary>
@@ -155,7 +158,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oGenerate.Parse();
 				
 				// If result is OK add Generate Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oGenerate );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oGenerate );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.GENERATE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oGenerate );
+				}
 
 				// Detach OnParseFailed Event
 				oGenerate.ParseFailed -= OnParseFailed;
@@ -188,7 +202,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oAdvance.Parse();
 				
 				// If result is OK add Advance Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oAdvance );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oAdvance );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.ADVANCE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oAdvance );
+				}
 					
 				// Detach OnParseFailed Event
 				oAdvance.ParseFailed -= OnParseFailed;
@@ -221,7 +246,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oTerminate.Parse();
 
 				// If result is OK add Terminate Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oTerminate );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oTerminate );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.TERMINATE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oTerminate );
+				}
 
 				// Detach OnParseFailed Event
 				oTerminate.ParseFailed -= OnParseFailed;
@@ -287,7 +323,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oEnter.Parse();
 
 				// If result is OK add Enter Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oEnter );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel, oEnter );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.ENTER, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oEnter );
+				}
 
 				// Detach OnParseFailed Event
 				oEnter.ParseFailed -= OnParseFailed;
@@ -320,7 +367,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oLeave.Parse();
 
 				// If result is OK add Leave Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oLeave );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oLeave );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.LEAVE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oLeave );
+				}
 
 				// Detach OnParseFailed Event
 				oLeave.ParseFailed -= OnParseFailed;
@@ -353,7 +411,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oSeize.Parse();
 
 				// If result is OK add Seize Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oSeize );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oSeize );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.SEIZE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oSeize );
+				}
 
 				// Detach OnParseFailed Event
 				oSeize.ParseFailed -= OnParseFailed;
@@ -386,7 +455,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oRelease.Parse();
 
 				// If result is OK add Release Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oRelease );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oRelease );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.RELEASE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oRelease );
+				}
 
 				// Detach OnParseFailed Event
 				oRelease.ParseFailed -= OnParseFailed;
@@ -419,7 +499,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oQueue.Parse();
 
 				// If result is OK add Queue Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oQueue );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oQueue );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.QUEUE, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oQueue );
+				}
 
 				// Detach OnParseFailed Event
 				oQueue.ParseFailed -= OnParseFailed;
@@ -452,7 +543,18 @@ namespace Viper.Framework.Blocks
 				BlockParseResult bBlockParsedResult = oDepart.Parse();
 
 				// If result is OK add Depart Block in Viper Model
-				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oDepart );
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oDepart );
+					}
+					catch( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.DEPART, iLineNumber, ex.Message );
+					}
+					lbViperModel.Add( oDepart );
+				}
 
 				// Detach OnParseFailed Event
 				oDepart.ParseFailed -= OnParseFailed;
@@ -546,5 +648,33 @@ namespace Viper.Framework.Blocks
 			else
 				ErrorMessageLog.Add( String.Format( sErrorMessageFormat, sBlockName, iLineNumber, sMessage ) );
 		}
+
+		/// <summary>
+		/// Set Next and Previous Block
+		/// </summary>
+		/// <param name="lbViperModel"></param>
+		/// <param name="oBlock"></param>
+		private void SetPreviousAndNextBlock( List<Block> lbViperModel , BlockTransactional oBlock )
+		{
+			if ( lbViperModel.Count > 0 )
+			{
+				Block lastBlock = lbViperModel.Last();
+				if ( lastBlock is BlockTransactional ) // only chain to transactional blocks
+				{
+					BlockTransactional lastBlockTransactional = lastBlock as BlockTransactional;
+					lastBlockTransactional.NextBlock = oBlock;
+					oBlock.PreviousBlock = lastBlockTransactional;
+				}
+				else
+				{
+					List<Block> lbTransactionalBlocks = lbViperModel.FindAll( b => b.Executable );
+					if ( lbTransactionalBlocks.Count > 0 )
+					{
+						throw new BlockIntegrityException( "Non-Transactional Blocks cannot be used between transactional blocks", null, String.Empty, oBlock.Line );
+					}
+				}
+			}
+		}
+		#endregion
 	}
 }

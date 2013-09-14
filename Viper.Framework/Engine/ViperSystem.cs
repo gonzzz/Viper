@@ -90,6 +90,17 @@ namespace Viper.Framework.Engine
 		/// <summary>
 		/// 
 		/// </summary>
+		public List<Block> Blocks
+		{
+			get
+			{
+				return m_lbSimulationBlocks;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		public int TerminationCount
 		{
 			get
@@ -120,13 +131,11 @@ namespace Viper.Framework.Engine
 				// 3) Add Entity Objects to Model
 				CreateEntitiesForNonTransactionalBlocks();
 
-				// 4) Start Simulation!
-
-				// 4a) Set termination count (simulation will end when this number gets to zero)
+				// 4) Set termination count (simulation will end when this number gets to zero)
 				m_iTerminationCount = iTerminationCount;
 
-				// 4b) Detect GENERATE blocks and "prime" first transactions from there
-				
+				// 5) Start Simulation
+				m_oScheduler.Simulate();				
 
 				return true;
 			}

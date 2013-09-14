@@ -22,6 +22,11 @@ namespace Viper.Framework.Entities
 			get;
 			set;
 		}
+		public String RawTextSNA
+		{
+			get;
+			set;
+		}
 		public SNAParameter Parameter
 		{
 			get;
@@ -40,6 +45,7 @@ namespace Viper.Framework.Entities
 		/// </summary>
 		public SNATranslated()
 		{
+			Parameter = null;
 			ExtraParameters = new List<SNAParameter>();
 		}
 
@@ -48,12 +54,12 @@ namespace Viper.Framework.Entities
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="sna"></param>
-		public SNATranslated( SNAType type, SNA sna )
+		public SNATranslated( String raw, SNAType type, SNA sna )
 			: this()
 		{
+			RawTextSNA = raw;
 			Type = type;
 			SNA = sna;
-			Parameter = null;
 		}
 		#endregion
 	}

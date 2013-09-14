@@ -8,6 +8,11 @@ namespace Viper.Framework.Enums
 	public enum BlockProcessResult
 	{
 		/// <summary>
+		/// Transaction couldn't be processed due to an exception
+		/// </summary>
+		TRANSACTION_EXCEPTION = -1,
+
+		/// <summary>
 		/// Transaction has been processed
 		/// </summary>
 		TRANSACTION_PROCESSED = 1,

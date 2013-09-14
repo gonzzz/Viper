@@ -165,6 +165,23 @@ namespace Viper.Framework.Entities
 		}
 		#endregion
 
+		#region Public Engine Control Flags Properties
+		/// <summary>
+		/// 
+		/// </summary>
+		public int NextSystemTime { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ChangeFlag { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public bool ScanStatus { get; set; }
+		#endregion
+
 		#region Constructors
 		/// <summary>
 		/// Default Constructor

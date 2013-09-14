@@ -763,6 +763,122 @@ namespace Viper.Test
 
 			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
 		}
+
+		[TestMethod]
+		public void TestBlockChainNextAndPreviousIsCorrect()
+		{
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "	GENERATE	120,30" , Environment.NewLine );
+			strGPSSModel += String.Concat( "	ENTER		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "	ADVANCE		20,5" , Environment.NewLine );
+			strGPSSModel += String.Concat( "	LEAVE		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "	TERMINATE	1" , Environment.NewLine );
+
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			BlockTransactional firstBlock = viperModel[ 0 ] as BlockTransactional;
+			BlockTransactional secondBlock = viperModel[ 1 ] as BlockTransactional;
+			BlockTransactional thirdBlock = viperModel[ 2 ] as BlockTransactional;
+			BlockTransactional fourthBlock = viperModel[ 3 ] as BlockTransactional;
+			BlockTransactional fifthBlock = viperModel[ 4 ] as BlockTransactional;
+
+			Assert.IsNull( firstBlock.PreviousBlock );
+			Assert.AreEqual( firstBlock.NextBlock, secondBlock );
+			Assert.AreEqual( secondBlock.PreviousBlock , firstBlock );
+			Assert.AreEqual( secondBlock.NextBlock , thirdBlock );
+			Assert.AreEqual( thirdBlock.PreviousBlock , secondBlock );
+			Assert.AreEqual( thirdBlock.NextBlock , fourthBlock );
+			Assert.AreEqual( fourthBlock.PreviousBlock , thirdBlock );
+			Assert.AreEqual( fourthBlock.NextBlock , fifthBlock );
+			Assert.AreEqual( fifthBlock.PreviousBlock , fourthBlock );
+			Assert.IsNull( fifthBlock.NextBlock );
+		}
+
+		[TestMethod]
+		public void TestBlockChainNextAndPreviousIsCorrectWithNonTransactionalFirst()
+		{
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "SALON	STORAGE	200" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		GENERATE	120,30" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		20,5" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE	1" , Environment.NewLine );
+
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			Block storageBlock = viperModel[ 0 ];
+			Assert.IsFalse( storageBlock is BlockTransactional );
+
+			BlockTransactional firstBlock = viperModel[ 1 ] as BlockTransactional;
+			BlockTransactional secondBlock = viperModel[ 2 ] as BlockTransactional;
+			BlockTransactional thirdBlock = viperModel[ 3 ] as BlockTransactional;
+			BlockTransactional fourthBlock = viperModel[ 4 ] as BlockTransactional;
+			BlockTransactional fifthBlock = viperModel[ 5 ] as BlockTransactional;
+
+			Assert.IsNull( firstBlock.PreviousBlock );
+			Assert.AreEqual( firstBlock.NextBlock , secondBlock );
+			Assert.AreEqual( secondBlock.PreviousBlock , firstBlock );
+			Assert.AreEqual( secondBlock.NextBlock , thirdBlock );
+			Assert.AreEqual( thirdBlock.PreviousBlock , secondBlock );
+			Assert.AreEqual( thirdBlock.NextBlock , fourthBlock );
+			Assert.AreEqual( fourthBlock.PreviousBlock , thirdBlock );
+			Assert.AreEqual( fourthBlock.NextBlock , fifthBlock );
+			Assert.AreEqual( fifthBlock.PreviousBlock , fourthBlock );
+			Assert.IsNull( fifthBlock.NextBlock );
+		}
+
+		[TestMethod]
+		public void TestBlockChainNextAndPreviousIsCorrectWithNonTransactionalLast()
+		{
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "		GENERATE	120,30" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		20,5" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE	1" , Environment.NewLine );
+			strGPSSModel += String.Concat( "SALON	STORAGE	200" , Environment.NewLine );
+
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			BlockTransactional firstBlock = viperModel[ 0 ] as BlockTransactional;
+			BlockTransactional secondBlock = viperModel[ 1 ] as BlockTransactional;
+			BlockTransactional thirdBlock = viperModel[ 2 ] as BlockTransactional;
+			BlockTransactional fourthBlock = viperModel[ 3 ] as BlockTransactional;
+			BlockTransactional fifthBlock = viperModel[ 4 ] as BlockTransactional;
+
+			Block storageBlock = viperModel[ 5 ];
+			Assert.IsFalse( storageBlock is BlockTransactional );
+
+			Assert.IsNull( firstBlock.PreviousBlock );
+			Assert.AreEqual( firstBlock.NextBlock , secondBlock );
+			Assert.AreEqual( secondBlock.PreviousBlock , firstBlock );
+			Assert.AreEqual( secondBlock.NextBlock , thirdBlock );
+			Assert.AreEqual( thirdBlock.PreviousBlock , secondBlock );
+			Assert.AreEqual( thirdBlock.NextBlock , fourthBlock );
+			Assert.AreEqual( fourthBlock.PreviousBlock , thirdBlock );
+			Assert.AreEqual( fourthBlock.NextBlock , fifthBlock );
+			Assert.AreEqual( fifthBlock.PreviousBlock , fourthBlock );
+			Assert.IsNull( fifthBlock.NextBlock );
+		}
+
+		[TestMethod]
+		public void TestBlockChainNextAndPreviousIsWrongWithNonTransactionalMiddle()
+		{
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "		GENERATE	120,30" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "SALON	STORAGE	200" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		20,5" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALON,2" , Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE	1" , Environment.NewLine );
+			
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count > 0 );
+
+			Assert.AreEqual( 6, viperModel.Count );
+		}
 		#endregion
 	}
 }

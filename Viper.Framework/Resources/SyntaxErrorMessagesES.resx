@@ -129,4 +129,7 @@
   <data name="WRONG_BLOCK_SYNTAX" xml:space="preserve">
     <value>El bloque '{0}' en la linea {1} tiene una sintáxis erronea. Por favor proceda a corregirlo para continuar creando el modelo de simulación.</value>
   </data>
+  <data name="WRONG_SNA_UTILIZATION" xml:space="preserve">
+    <value>El SNA '{0}' en la linea {1} no puede ser utilizado. Por favor proceda a corregirlo para continuar ejecutando el modelo de simulación.</value>
+  </data>
 </root>

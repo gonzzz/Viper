@@ -13,7 +13,7 @@ namespace Viper.Framework.Blocks
 	/// <summary>
 	/// Advance Block Class. Calculate next simulation time and puts the Transaction in the FEC.
 	/// </summary>
-	public class AdvanceBlock : BlockTransactional, IParseable
+	public class AdvanceBlock : BlockTransactional, IParseable, IProcessable
 	{
 		#region Operands
 		/// <summary>
@@ -148,9 +148,75 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		public override BlockProcessResult Process( Transaction oTransaction )
+		#region IProcessable Implementation
+		public BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Calculate Transaction nEXT Time
+				int iNextTime = Constants.DEFAULT_ZERO_VALUE;
+				int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
+				int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
+
+				if ( !this.OperandA.IsEmpty )
+				{
+					iMean = BlockOperand.GetIntValueFromOperand( this.OperandA , BlockNames.ADVANCE , this.Line );
+				}
+
+				if ( !this.OperandB.IsEmpty )
+				{
+					iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB , BlockNames.ADVANCE , this.Line );
+				}
+
+				// Calculate Next Transaction Time with Mean, Desviation
+				iNextTime = ViperSystem.Instance().TransactionScheduler.SystemTime;
+				iNextTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0, iDesviation ) );
+
+				if ( iNextTime < ViperSystem.Instance().TransactionScheduler.SystemTime ) 
+					throw new BlockProcessException( "Transaction Next Time cannot be lowert than Current System Time" , 
+													 null , BlockNames.ADVANCE , this.Line );
+
+				// Update Transaction Time
+				oTransaction.NextSystemTime = iNextTime;
+
+				// Insert Transaction Into the FEC
+				ViperSystem.Instance().TransactionScheduler.InsertTransactionIntoFEC( oTransaction );
+
+				// Remove Transaction From CEC
+				ViperSystem.Instance().TransactionScheduler.RemoveTransactionFromCEC( oTransaction );
+
+				// Increment Block Transaction Count (basic)
+				this.m_iEntryCount++;
+				
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.ADVANCE , this.Line , String.Empty ) );
+
+				// Return Success
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.ADVANCE , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
+
+		public event EventHandler ProcessSuccess;
+		public event EventHandler ProcessFailed;
+
+		public void OnProcessSuccess( ProcessEventArgs eventArgs )
+		{
+			if ( ProcessSuccess != null ) ProcessSuccess( this , eventArgs );
+		}
+
+		public void OnProcessFailed( ProcessEventArgs eventArgs )
+		{
+			if ( ProcessFailed != null ) ProcessFailed( this , eventArgs );
+
+		}
+		#endregion
 	}
 }

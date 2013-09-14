@@ -6,13 +6,14 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
 	/// <summary>
 	/// Generate Block Class. Creates transactions and places them in the FEC.
 	/// </summary>
-	public class GenerateBlock : BlockTransactional, IParseable
+	public class GenerateBlock : BlockTransactional, IParseable, IProcessable
 	{
 		#region Operands
 		/// <summary>
@@ -160,9 +161,108 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		public override BlockProcessResult Process( Transaction oTransaction )
+		#region IProcessable methods
+		public BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Calculate Transaction Arrival Time
+				int iArrivalTime = Constants.DEFAULT_ZERO_VALUE;
+				int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
+				int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
+				int iDelayForFirstTransaction = Constants.DEFAULT_ZERO_VALUE; // From Operand C
+				int iMaxTransactionsToGenerate = Constants.DEFAULT_ZERO_VALUE; // From Operand D
+				int iTransactionPriority = Constants.DEFAULT_ZERO_VALUE; // From Operand E
+
+				if( !this.OperandA.IsEmpty ) 
+				{
+					iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.GENERATE, this.Line );
+				}
+			
+				if( !this.OperandB.IsEmpty )
+				{
+					iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB , BlockNames.GENERATE , this.Line );
+				}
+
+				if ( !this.OperandC.IsEmpty )
+				{
+					iDelayForFirstTransaction = BlockOperand.GetIntValueFromOperand( this.OperandC , BlockNames.GENERATE , this.Line );
+				}
+
+				if ( !this.OperandD.IsEmpty )
+				{
+					iMaxTransactionsToGenerate = BlockOperand.GetIntValueFromOperand( this.OperandD , BlockNames.GENERATE , this.Line );
+				}
+
+				if ( !this.OperandE.IsEmpty )
+				{
+					iTransactionPriority = BlockOperand.GetIntValueFromOperand( this.OperandE , BlockNames.GENERATE , this.Line );
+				}
+
+				// Calculate Arrival Time with Mean, Desviation and DelayForFirst (optional)
+				iArrivalTime = ViperSystem.Instance().TransactionScheduler.SystemTime;
+				if ( this.m_iEntryCount == Constants.DEFAULT_ZERO_VALUE && 
+					 iDelayForFirstTransaction > Constants.DEFAULT_ZERO_VALUE )
+				{
+					iArrivalTime += iDelayForFirstTransaction;
+				}
+				iArrivalTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0 , iDesviation ) );
+
+				if ( iArrivalTime < ViperSystem.Instance().TransactionScheduler.SystemTime )
+					throw new BlockProcessException( "Transaction Arrival Time cannot be lower than Current System Time", 
+													 null , BlockNames.GENERATE , this.Line );
+
+
+				// Verify MaxTransactionsToGenerate has a value and it is not exceeded
+				if( iMaxTransactionsToGenerate > Constants.DEFAULT_ZERO_VALUE &&
+					this.m_iEntryCount > iMaxTransactionsToGenerate )
+				{
+					// Notify Fail
+					OnProcessFailed( new ProcessEventArgs( BlockNames.GENERATE , this.Line , String.Empty ) );
+
+					// Return Fail
+					return BlockProcessResult.TRANSACTION_ENTRY_REFUSED;
+				}
+
+				// Update Transaction: NextSystemTime, CurrentBlock and optionaly its Priority
+				oTransaction.NextSystemTime = iArrivalTime;
+				oTransaction.CurrentBlock = this;
+				if ( iTransactionPriority > Constants.DEFAULT_ZERO_VALUE ) oTransaction.Priority = iTransactionPriority;
+
+				// Put Transaction in the FEC
+				ViperSystem.Instance().TransactionScheduler.InsertTransactionIntoFEC( oTransaction );
+
+				// Increment Block Transaction Count (basic)
+				this.m_iEntryCount++;
+
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.GENERATE , this.Line , String.Empty ) );
+
+				// Return Success
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch( Exception ex ) 
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.GENERATE , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
+
+		public event EventHandler ProcessSuccess;
+		public event EventHandler ProcessFailed;
+
+		public void OnProcessSuccess( ProcessEventArgs eventArgs )
+		{
+			if ( ProcessSuccess != null ) ProcessSuccess( this , eventArgs );
+		}
+
+		public void OnProcessFailed( ProcessEventArgs eventArgs )
+		{
+			if ( ProcessFailed != null ) ProcessFailed( this , eventArgs );
+		}
+		#endregion
 	}
 }

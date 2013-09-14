@@ -5,6 +5,8 @@ using System.Text;
 using Viper.Framework.Entities;
 using Viper.Framework.Engine;
 using Viper.Framework.Utils;
+using Viper.Framework.Enums;
+using Viper.Framework.Exceptions;
 
 namespace Viper.Framework.Blocks
 {
@@ -193,6 +195,7 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
+		#region Public Static Methods
 		/// <summary>
 		/// Returns a new Empty Block Operand
 		/// </summary>
@@ -229,6 +232,48 @@ namespace Viper.Framework.Blocks
 		}
 
 		/// <summary>
+		/// Returns the integer value of an Operand, whether is a positive integer or infered from a name or 
+		/// indirectly from an SNA.
+		/// </summary>
+		/// <param name="operand"></param>
+		/// <param name="strBlockName"></param>
+		/// <param name="iBlockLine"></param>
+		/// <returns></returns>
+		public static int GetIntValueFromOperand( BlockOperand operand, string strBlockName, int iBlockLine )
+		{
+			int iOperandValue = Constants.DEFAULT_ZERO_VALUE;
+			if ( operand.IsPosInteger )
+			{
+				iOperandValue = operand.PosInteger;
+			}
+			else if ( operand.IsName )
+			{
+				// TODO: Implement Name Search
+				throw new NotImplementedException();
+			}
+			else if ( operand.IsSNA )
+			{
+				// TODO: Implement SNA indirect
+				if ( operand.SNA.Type == SNAType.Function )
+				{
+					throw new NotImplementedException();
+				}
+				else if ( operand.SNA.Type == SNAType.Variable )
+				{
+					throw new NotImplementedException();
+				}
+				else
+				{
+					throw new BlockProcessException( String.Format( "Wrong SNA utilization: '{0}'." , operand.SNA.RawTextSNA ) ,
+													 null , strBlockName , iBlockLine );
+				}
+			}
+			return iOperandValue;
+		}
+		#endregion
+
+		#region Private Static Methods
+		/// <summary>
 		/// Private Method that do the parsing
 		/// </summary>
 		/// <param name="operand"></param>
@@ -258,5 +303,6 @@ namespace Viper.Framework.Blocks
 			}
 			return blockOperand;
 		}
+		#endregion
 	}
 }

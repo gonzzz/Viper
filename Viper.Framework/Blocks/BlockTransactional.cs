@@ -12,10 +12,62 @@ namespace Viper.Framework.Blocks
 		#region Protected Members
 		protected Transaction m_oActiveTransaction;
 		protected List<Transaction> m_ltRetryTransactionChain;
+		protected Block m_bPreviousBlock;
+		protected Block m_bNextBlock;
 		#endregion
 
 		#region Public Properties
+		/// <summary>
+		/// 
+		/// </summary>
+		public Transaction ActiveTransaction
+		{
+			get 
+			{
+				return m_oActiveTransaction;
+			}
+		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public List<Transaction> RetryChain
+		{
+			get
+			{
+				return m_ltRetryTransactionChain;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Block PreviousBlock
+		{
+			get
+			{
+				return m_bPreviousBlock;
+			}
+			set
+			{
+				m_bPreviousBlock = value;
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public Block NextBlock
+		{
+			get
+			{
+				return m_bNextBlock;
+			}
+			set
+			{
+				m_bNextBlock = value;
+			}
+		}
 		#endregion
 
 		#region Constructors
@@ -26,6 +78,10 @@ namespace Viper.Framework.Blocks
 			: base()
 		{
 			this.m_bExecutable = true;
+			this.m_bPreviousBlock = null;
+			this.m_bNextBlock = null;
+			this.m_oActiveTransaction = null;
+			this.m_ltRetryTransactionChain = new List<Transaction>();
 		}
 
 		/// <summary>
@@ -38,14 +94,11 @@ namespace Viper.Framework.Blocks
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
 			this.m_bExecutable = true;
+			this.m_bPreviousBlock = null;
+			this.m_bNextBlock = null;
+			this.m_oActiveTransaction = null;
+			this.m_ltRetryTransactionChain = new List<Transaction>();
 		}
 		#endregion
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="oTransaction"></param>
-		/// <returns></returns>
-		public abstract BlockProcessResult Process( Transaction oTransaction );
 	}
 }

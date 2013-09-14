@@ -48,6 +48,7 @@
     <Compile Include="Blocks\EnterBlock.cs" />
     <Compile Include="Blocks\GenerateBlock.cs" />
     <Compile Include="Blocks\IParseable.cs" />
+    <Compile Include="Blocks\IProcessable.cs" />
     <Compile Include="Blocks\LeaveBlock.cs" />
     <Compile Include="Blocks\QueueBlock.cs" />
     <Compile Include="Blocks\ReleaseBlock.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Blocks\BlockFactory.cs" />
     <Compile Include="Exceptions\BlockIntegrityException.cs" />
     <Compile Include="Exceptions\BlockParseException.cs" />
+    <Compile Include="Exceptions\BlockProcessException.cs" />
     <Compile Include="Exceptions\InvalidSNASpecifierException.cs" />
     <Compile Include="Exceptions\ModelIntegrityException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,6 +91,7 @@
     <Compile Include="Utils\Constants.cs" />
     <Compile Include="Utils\DeprecatedBlockNames.cs" />
     <Compile Include="Utils\Languages.cs" />
+    <Compile Include="Utils\RandomGenerator.cs" />
     <Compile Include="Utils\SNAPrefixes.cs" />
   </ItemGroup>
   <ItemGroup />
