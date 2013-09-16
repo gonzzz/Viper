@@ -55,7 +55,6 @@
     <Compile Include="Blocks\SeizeBlock.cs" />
     <Compile Include="Blocks\StorageBlock.cs" />
     <Compile Include="Blocks\TerminateBlock.cs" />
-    <Compile Include="Engine\ViperScheduler.cs" />
     <Compile Include="Engine\ViperSNATranslator.cs" />
     <Compile Include="Engine\ViperSystem.cs" />
     <Compile Include="Entities\Entity.cs" />
@@ -68,6 +67,7 @@
     <Compile Include="Entities\Transaction.cs" />
     <Compile Include="Enums\BlockParseResult.cs" />
     <Compile Include="Enums\BlockProcessResult.cs" />
+    <Compile Include="Enums\SimulationState.cs" />
     <Compile Include="Enums\SNA.cs" />
     <Compile Include="Enums\TransactionState.cs" />
     <Compile Include="Blocks\BlockFactory.cs" />

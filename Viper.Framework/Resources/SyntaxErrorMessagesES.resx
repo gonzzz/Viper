@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="EXCEPTION_ADVANCE_TRANSACTION_NEXT_TIME" xml:space="preserve">
+    <value>El siguiente tiempo de una Transaccion no puede ser menor que el tiempo actual del Sistema</value>
+  </data>
+  <data name="EXCEPTION_GENERATE_TRANSACTION_ARRIVAL_TIME" xml:space="preserve">
+    <value>El tiempo de arribo de una Transaccion no puede ser menor que el tiempo actual del Sistema</value>
+  </data>
   <data name="EXCEPTION_ON_BLOCK_PARSING_NO_BLOCK_NAME" xml:space="preserve">
     <value>Ha occurido un error de excepción al parsear un bloque en la linea {0}. Mensaje: {1}.</value>
   </data>

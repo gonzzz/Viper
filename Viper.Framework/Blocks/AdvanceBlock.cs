@@ -149,44 +149,34 @@ namespace Viper.Framework.Blocks
 		#endregion
 
 		#region IProcessable Implementation
-		public BlockProcessResult Process( ref Transaction oTransaction )
+		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
 			try
 			{
-				// Calculate Transaction nEXT Time
-				int iNextTime = Constants.DEFAULT_ZERO_VALUE;
-				int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
-				int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
+				int iNextTime = CalculateNextTime();
 
-				if ( !this.OperandA.IsEmpty )
+				if( iNextTime < ViperSystem.Instance().SystemTime )
 				{
-					iMean = BlockOperand.GetIntValueFromOperand( this.OperandA , BlockNames.ADVANCE , this.Line );
+					string strMessage = Resources.SyntaxErrorMessagesEN.EXCEPTION_ADVANCE_TRANSACTION_NEXT_TIME;
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish ) 
+						strMessage = Resources.SyntaxErrorMessagesES.EXCEPTION_ADVANCE_TRANSACTION_NEXT_TIME;
+
+					throw new BlockProcessException( strMessage, null, BlockNames.ADVANCE, this.Line );
 				}
 
-				if ( !this.OperandB.IsEmpty )
-				{
-					iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB , BlockNames.ADVANCE , this.Line );
-				}
+				// We do common process here
+				base.Process( ref oTransaction );
 
-				// Calculate Next Transaction Time with Mean, Desviation
-				iNextTime = ViperSystem.Instance().TransactionScheduler.SystemTime;
-				iNextTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0, iDesviation ) );
-
-				if ( iNextTime < ViperSystem.Instance().TransactionScheduler.SystemTime ) 
-					throw new BlockProcessException( "Transaction Next Time cannot be lowert than Current System Time" , 
-													 null , BlockNames.ADVANCE , this.Line );
-
-				// Update Transaction Time
+				// Update Transaction Time and ScanStatus (transaction will remain in FEC until next time equal system time)
 				oTransaction.NextSystemTime = iNextTime;
-
-				// Insert Transaction Into the FEC
-				ViperSystem.Instance().TransactionScheduler.InsertTransactionIntoFEC( oTransaction );
+				oTransaction.State = TransactionState.PASSIVE;
+				oTransaction.ScanStatus = true;
 
 				// Remove Transaction From CEC
-				ViperSystem.Instance().TransactionScheduler.RemoveTransactionFromCEC( oTransaction );
+				ViperSystem.Instance().RemoveTransactionFromCEC( oTransaction );
 
-				// Increment Block Transaction Count (basic)
-				this.m_iEntryCount++;
+				// Insert Transaction Into the FEC
+				ViperSystem.Instance().InsertTransactionIntoFEC( oTransaction );
 				
 				// Notify Success
 				OnProcessSuccess( new ProcessEventArgs( BlockNames.ADVANCE , this.Line , String.Empty ) );
@@ -204,18 +194,32 @@ namespace Viper.Framework.Blocks
 			}
 		}
 
-		public event EventHandler ProcessSuccess;
-		public event EventHandler ProcessFailed;
-
-		public void OnProcessSuccess( ProcessEventArgs eventArgs )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private int CalculateNextTime()
 		{
-			if ( ProcessSuccess != null ) ProcessSuccess( this , eventArgs );
-		}
+			// Calculate Transaction Next Time
+			int iNextTime = Constants.DEFAULT_ZERO_VALUE;
+			int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
+			int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
 
-		public void OnProcessFailed( ProcessEventArgs eventArgs )
-		{
-			if ( ProcessFailed != null ) ProcessFailed( this , eventArgs );
+			if( !this.OperandA.IsEmpty )
+			{
+				iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.ADVANCE, this.Line );
+			}
 
+			if( !this.OperandB.IsEmpty )
+			{
+				iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB, BlockNames.ADVANCE, this.Line );
+			}
+
+			// Calculate Next Transaction Time with Mean, Desviation
+			iNextTime = ViperSystem.Instance().SystemTime;
+			iNextTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0, iDesviation ) );
+
+			return iNextTime;
 		}
 		#endregion
 	}

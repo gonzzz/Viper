@@ -13,7 +13,7 @@ namespace Viper.Framework.Blocks
 	/// <summary>
 	/// Generate Block Class. Creates transactions and places them in the FEC.
 	/// </summary>
-	public class GenerateBlock : BlockTransactional, IParseable, IProcessable
+	public class GenerateBlock : BlockTransactional, IParseable
 	{
 		#region Operands
 		/// <summary>
@@ -162,56 +162,23 @@ namespace Viper.Framework.Blocks
 		#endregion
 
 		#region IProcessable methods
-		public BlockProcessResult Process( ref Transaction oTransaction )
+		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
 			try
 			{
 				// Calculate Transaction Arrival Time
-				int iArrivalTime = Constants.DEFAULT_ZERO_VALUE;
-				int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
-				int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
-				int iDelayForFirstTransaction = Constants.DEFAULT_ZERO_VALUE; // From Operand C
-				int iMaxTransactionsToGenerate = Constants.DEFAULT_ZERO_VALUE; // From Operand D
-				int iTransactionPriority = Constants.DEFAULT_ZERO_VALUE; // From Operand E
+				int iArrivalTime = CalculateArrivalTime(); // From Operands A,B,C
+				int iMaxTransactionsToGenerate = GetMaxTransactionsToGenerate(); // From Operand D
+				int iTransactionPriority = GetTransactionPriority(); // From Operand E
 
-				if( !this.OperandA.IsEmpty ) 
+				if( iArrivalTime < ViperSystem.Instance().SystemTime )
 				{
-					iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.GENERATE, this.Line );
-				}
-			
-				if( !this.OperandB.IsEmpty )
-				{
-					iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB , BlockNames.GENERATE , this.Line );
-				}
+					string strMessage = Resources.SyntaxErrorMessagesEN.EXCEPTION_GENERATE_TRANSACTION_ARRIVAL_TIME;
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish )
+						strMessage = Resources.SyntaxErrorMessagesES.EXCEPTION_GENERATE_TRANSACTION_ARRIVAL_TIME;
 
-				if ( !this.OperandC.IsEmpty )
-				{
-					iDelayForFirstTransaction = BlockOperand.GetIntValueFromOperand( this.OperandC , BlockNames.GENERATE , this.Line );
+					throw new BlockProcessException( strMessage, null, BlockNames.GENERATE, this.Line );
 				}
-
-				if ( !this.OperandD.IsEmpty )
-				{
-					iMaxTransactionsToGenerate = BlockOperand.GetIntValueFromOperand( this.OperandD , BlockNames.GENERATE , this.Line );
-				}
-
-				if ( !this.OperandE.IsEmpty )
-				{
-					iTransactionPriority = BlockOperand.GetIntValueFromOperand( this.OperandE , BlockNames.GENERATE , this.Line );
-				}
-
-				// Calculate Arrival Time with Mean, Desviation and DelayForFirst (optional)
-				iArrivalTime = ViperSystem.Instance().TransactionScheduler.SystemTime;
-				if ( this.m_iEntryCount == Constants.DEFAULT_ZERO_VALUE && 
-					 iDelayForFirstTransaction > Constants.DEFAULT_ZERO_VALUE )
-				{
-					iArrivalTime += iDelayForFirstTransaction;
-				}
-				iArrivalTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0 , iDesviation ) );
-
-				if ( iArrivalTime < ViperSystem.Instance().TransactionScheduler.SystemTime )
-					throw new BlockProcessException( "Transaction Arrival Time cannot be lower than Current System Time", 
-													 null , BlockNames.GENERATE , this.Line );
-
 
 				// Verify MaxTransactionsToGenerate has a value and it is not exceeded
 				if( iMaxTransactionsToGenerate > Constants.DEFAULT_ZERO_VALUE &&
@@ -224,16 +191,16 @@ namespace Viper.Framework.Blocks
 					return BlockProcessResult.TRANSACTION_ENTRY_REFUSED;
 				}
 
-				// Update Transaction: NextSystemTime, CurrentBlock and optionaly its Priority
+				// We do common process here
+				base.Process( ref oTransaction );
+
+				// Update Transaction: NextSystemTime, State and optionaly its Priority
 				oTransaction.NextSystemTime = iArrivalTime;
-				oTransaction.CurrentBlock = this;
+				oTransaction.State = TransactionState.PASSIVE;
 				if ( iTransactionPriority > Constants.DEFAULT_ZERO_VALUE ) oTransaction.Priority = iTransactionPriority;
 
 				// Put Transaction in the FEC
-				ViperSystem.Instance().TransactionScheduler.InsertTransactionIntoFEC( oTransaction );
-
-				// Increment Block Transaction Count (basic)
-				this.m_iEntryCount++;
+				ViperSystem.Instance().InsertTransactionIntoFEC( oTransaction );
 
 				// Notify Success
 				OnProcessSuccess( new ProcessEventArgs( BlockNames.GENERATE , this.Line , String.Empty ) );
@@ -251,17 +218,70 @@ namespace Viper.Framework.Blocks
 			}
 		}
 
-		public event EventHandler ProcessSuccess;
-		public event EventHandler ProcessFailed;
-
-		public void OnProcessSuccess( ProcessEventArgs eventArgs )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private int CalculateArrivalTime()
 		{
-			if ( ProcessSuccess != null ) ProcessSuccess( this , eventArgs );
+			int iArrivalTime = Constants.DEFAULT_ZERO_VALUE;
+			int iMean = Constants.DEFAULT_ZERO_VALUE; // From Operand A
+			int iDesviation = Constants.DEFAULT_ZERO_VALUE; // From Operand B
+			int iDelayForFirstTransaction = Constants.DEFAULT_ZERO_VALUE; // From Operand C
+
+			if( !this.OperandA.IsEmpty )
+			{
+				iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.GENERATE, this.Line );
+			}
+
+			if( !this.OperandB.IsEmpty )
+			{
+				iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB, BlockNames.GENERATE, this.Line );
+			}
+
+			if( !this.OperandC.IsEmpty )
+			{
+				iDelayForFirstTransaction = BlockOperand.GetIntValueFromOperand( this.OperandC, BlockNames.GENERATE, this.Line );
+			}
+
+			// Calculate Arrival Time with Mean, Desviation and DelayForFirst (optional)
+			iArrivalTime = ViperSystem.Instance().SystemTime;
+			if(	this.m_iEntryCount == Constants.DEFAULT_ZERO_VALUE &&
+				iDelayForFirstTransaction > Constants.DEFAULT_ZERO_VALUE )
+			{
+				iArrivalTime += iDelayForFirstTransaction;
+			}
+			iArrivalTime += ( iMean + RandomGenerator.Instance().GenerateRandomWithDesviation( 0, iDesviation ) );
+
+			return iArrivalTime;
 		}
 
-		public void OnProcessFailed( ProcessEventArgs eventArgs )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private int GetMaxTransactionsToGenerate()
 		{
-			if ( ProcessFailed != null ) ProcessFailed( this , eventArgs );
+			int iMaxTransactionsToGenerate = Int32.MaxValue;
+			if( !this.OperandD.IsEmpty )
+			{
+				iMaxTransactionsToGenerate = BlockOperand.GetIntValueFromOperand( this.OperandD, BlockNames.GENERATE, this.Line );
+			}
+			return iMaxTransactionsToGenerate;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private int GetTransactionPriority()
+		{
+			int iTransactionPriority = Constants.DEFAULT_ZERO_VALUE;
+			if( !this.OperandE.IsEmpty )
+			{
+				iTransactionPriority = BlockOperand.GetIntValueFromOperand( this.OperandE, BlockNames.GENERATE, this.Line );
+			}
+			return iTransactionPriority;
 		}
 		#endregion
 	}

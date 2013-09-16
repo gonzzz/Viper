@@ -16,8 +16,8 @@ namespace Viper.Framework.Entities
 	{
 		#region Private Members
 		private int m_iNumber;
-		private Block m_oCurrentBlock;
-		private Block m_oNextBlock;
+		private BlockTransactional m_oCurrentBlock;
+		private BlockTransactional m_oNextBlock;
 		private int m_iPriority;
 		private TransactionState m_tsState;
 		private bool m_bPreempted;
@@ -39,12 +39,16 @@ namespace Viper.Framework.Entities
 			{
 				return m_iNumber;
 			}
+			set
+			{
+				m_iNumber = value;
+			}
 		}
 
 		/// <summary>
 		/// Current Block in the current model.
 		/// </summary>
-		public Block CurrentBlock
+		public BlockTransactional CurrentBlock
 		{
 			get
 			{
@@ -59,7 +63,7 @@ namespace Viper.Framework.Entities
 		/// <summary>
 		/// Next Block in the current model.
 		/// </summary>
-		public Block NextBlock
+		public BlockTransactional NextBlock
 		{
 			get
 			{
@@ -174,12 +178,12 @@ namespace Viper.Framework.Entities
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool ChangeFlag { get; set; }
+		public bool ScanStatus { get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool ScanStatus { get; set; }
+		public bool AlreadyProcessed { get; set; }
 		#endregion
 
 		#region Constructors
@@ -200,6 +204,9 @@ namespace Viper.Framework.Entities
 			m_dParameters = new Dictionary<int, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
+			ScanStatus = false;
+			AlreadyProcessed = false;
+			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 
 		/// <summary>
@@ -221,6 +228,9 @@ namespace Viper.Framework.Entities
 			m_dParameters = new Dictionary<int, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
+			ScanStatus = false;
+			AlreadyProcessed = false;
+			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 		#endregion
 

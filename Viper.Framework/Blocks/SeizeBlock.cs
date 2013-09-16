@@ -9,7 +9,7 @@ using Viper.Framework.Entities;
 
 namespace Viper.Framework.Blocks
 {
-	public class SeizeBlock : BlockTransactional, IParseable, IProcessable
+	public class SeizeBlock : BlockTransactional, IParseable
 	{
 		#region Operands
 		/// <summary>
@@ -136,20 +136,7 @@ namespace Viper.Framework.Blocks
 		#endregion
 
 		#region IProcessable Implementation
-		public BlockProcessResult Process( ref Transaction oTransaction )
-		{
-			throw new NotImplementedException();
-		}
-
-		public event EventHandler ProcessSuccess;
-		public event EventHandler ProcessFailed;
-
-		public void OnProcessSuccess( ProcessEventArgs eventArgs )
-		{
-			throw new NotImplementedException();
-		}
-
-		public void OnProcessFailed( ProcessEventArgs eventArgs )
+		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
 			throw new NotImplementedException();
 		}
