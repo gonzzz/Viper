@@ -196,7 +196,6 @@ namespace Viper.Framework.Blocks
 
 				// Update Transaction: NextSystemTime, State and optionaly its Priority
 				oTransaction.NextSystemTime = iArrivalTime;
-				oTransaction.State = TransactionState.PASSIVE;
 				if ( iTransactionPriority > Constants.DEFAULT_ZERO_VALUE ) oTransaction.Priority = iTransactionPriority;
 
 				// Put Transaction in the FEC

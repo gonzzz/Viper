@@ -170,7 +170,23 @@ namespace Viper.Framework.Blocks
 		#region IProcessable Implementation
 		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				base.Process( ref oTransaction );
+
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.ENTER , this.Line , String.Empty ) );
+
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch ( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.ENTER , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 		#endregion
 	}

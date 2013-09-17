@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Viper.Framework.Engine;
+using System.Diagnostics;
 
 namespace Viper.Test
 {
@@ -23,6 +24,10 @@ namespace Viper.Test
 
 			Assert.AreEqual( ViperSystem.Instance().TerminationCount, 0 );
 			Assert.AreNotEqual( ViperSystem.Instance().TransactionCounter, 0 );
+
+			String strReport = ViperSystem.Instance().GetFinalReport();
+
+			Trace.Write( strReport );
 		}
 	}
 }

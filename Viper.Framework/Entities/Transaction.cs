@@ -16,14 +16,16 @@ namespace Viper.Framework.Entities
 	{
 		#region Private Members
 		private int m_iNumber;
+		private int m_iPriority;
+		private int m_iMarkTime;
+		private int m_iNextTime;
 		private BlockTransactional m_oCurrentBlock;
 		private BlockTransactional m_oNextBlock;
-		private int m_iPriority;
-		private TransactionState m_tsState;
+		private TransactionState m_tsState;		
 		private bool m_bPreempted;
 		private bool m_bDelayed;
 		private bool m_bTrace;
-		private int m_iMarkTime;
+		
 		private Dictionary<int, int> m_dParameters;
 		private List<Transaction> m_lAssemblySet;
 		#endregion
@@ -46,36 +48,6 @@ namespace Viper.Framework.Entities
 		}
 
 		/// <summary>
-		/// Current Block in the current model.
-		/// </summary>
-		public BlockTransactional CurrentBlock
-		{
-			get
-			{
-				return m_oCurrentBlock;
-			}
-			set
-			{
-				m_oCurrentBlock = value;
-			}
-		}
-
-		/// <summary>
-		/// Next Block in the current model.
-		/// </summary>
-		public BlockTransactional NextBlock
-		{
-			get
-			{
-				return m_oNextBlock;
-			}
-			set
-			{
-				m_oNextBlock = value;
-			}
-		}
-
-		/// <summary>
 		/// Transaction Priority set by the GENERATE block or PRIORITY block.
 		/// Related SNA: PR
 		/// </summary>
@@ -88,21 +60,6 @@ namespace Viper.Framework.Entities
 			set
 			{
 				m_iPriority = value;
-			}
-		}
-
-		/// <summary>
-		/// Current Transaction State. Can be ACTIVE, SUSPENDED, PASSIVE or TERMINATED.
-		/// </summary>
-		public TransactionState State
-		{
-			get
-			{
-				return m_tsState;
-			}
-			set
-			{
-				m_tsState = value;
 			}
 		}
 
@@ -169,21 +126,66 @@ namespace Viper.Framework.Entities
 		}
 		#endregion
 
-		#region Public Engine Control Flags Properties
+		#region Public Engine Control Properties
 		/// <summary>
-		/// 
+		/// Next System Time in Simulation Schedule
 		/// </summary>
-		public int NextSystemTime { get; set; }
+		public int NextSystemTime 
+		{ 
+			get 
+			{
+				return m_iNextTime;
+			}
+			set
+			{
+				m_iNextTime = value;
+			}
+		}
 
 		/// <summary>
-		/// 
+		/// Current Block in the current model.
 		/// </summary>
-		public bool ScanStatus { get; set; }
+		public BlockTransactional CurrentBlock
+		{
+			get
+			{
+				return m_oCurrentBlock;
+			}
+			set
+			{
+				m_oCurrentBlock = value;
+			}
+		}
 
 		/// <summary>
-		/// 
+		/// Current Transaction State. Can be ACTIVE, SUSPENDED, PASSIVE or TERMINATED.
 		/// </summary>
-		public bool AlreadyProcessed { get; set; }
+		public TransactionState State
+		{
+			get
+			{
+				return m_tsState;
+			}
+			set
+			{
+				m_tsState = value;
+			}
+		}
+
+		/// <summary>
+		/// Next Block in the current model.
+		/// </summary>
+		public BlockTransactional NextBlock
+		{
+			get
+			{
+				return m_oNextBlock;
+			}
+			set
+			{
+				m_oNextBlock = value;
+			}
+		}
 		#endregion
 
 		#region Constructors
@@ -197,16 +199,14 @@ namespace Viper.Framework.Entities
 			m_iMarkTime = Constants.DEFAULT_ZERO_VALUE;
 			m_oCurrentBlock = null;
 			m_oNextBlock = null;
-			m_tsState = TransactionState.SUSPENDED;
+			m_tsState = TransactionState.WAITING;
 			m_bPreempted = false;
 			m_bDelayed = false;
 			m_bTrace = false;
 			m_dParameters = new Dictionary<int, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
-			ScanStatus = false;
-			AlreadyProcessed = false;
-			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
+			m_iNextTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 
 		/// <summary>
@@ -221,16 +221,14 @@ namespace Viper.Framework.Entities
 			m_iMarkTime = iMarkTime;
 			m_oCurrentBlock = null;
 			m_oNextBlock = null;
-			m_tsState = TransactionState.SUSPENDED;
+			m_tsState = TransactionState.WAITING;
 			m_bPreempted = false;
 			m_bDelayed = false;
 			m_bTrace = false;
 			m_dParameters = new Dictionary<int, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
-			ScanStatus = false;
-			AlreadyProcessed = false;
-			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
+			m_iNextTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 		#endregion
 

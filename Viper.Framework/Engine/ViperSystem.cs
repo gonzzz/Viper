@@ -23,6 +23,7 @@ namespace Viper.Framework.Engine
 			m_eLanguage = Languages.Spanish;
 			m_lbSimulationBlocks = null;
 			m_oModel = new Model();
+			m_tCurrentActiveTransaction = null;
 			m_ltCurrentEventsChain = new List<Transaction>();
 			m_ltFutureEventsChain = new List<Transaction>();
 			m_iTerminationCount = Constants.DEFAULT_ZERO_VALUE;
@@ -52,11 +53,10 @@ namespace Viper.Framework.Engine
 		private SimulationState m_eState;
 		private int m_iSystemTime;
 		private int m_iTargetTime;
-		private int m_iCurrentTransactionNumber;
 		private int m_iTerminationCount;
 		private int m_iTransactionCounter;
-		private bool m_bChangeFlag;
 		private List<Block> m_lbSimulationBlocks;
+		private Transaction m_tCurrentActiveTransaction;
 		private List<Transaction> m_ltCurrentEventsChain;
 		private List<Transaction> m_ltFutureEventsChain;
 		#endregion
@@ -147,15 +147,15 @@ namespace Viper.Framework.Engine
 		/// <summary>
 		/// 
 		/// </summary>
-		public int CurrentTransactionNumber
+		public Transaction CurrentActiveTransaction
 		{
 			get
 			{
-				return m_iCurrentTransactionNumber;
+				return m_tCurrentActiveTransaction;
 			}
 			private set
 			{
-				m_iCurrentTransactionNumber = value;
+				m_tCurrentActiveTransaction = value;
 			}
 		}
 
@@ -192,21 +192,6 @@ namespace Viper.Framework.Engine
 		/// <summary>
 		/// 
 		/// </summary>
-		public bool ChangeFlag
-		{
-			get
-			{
-				return m_bChangeFlag;
-			}
-			set
-			{
-				m_bChangeFlag = value;
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
 		public List<String> ErrorMessageLog { get; set; }
 		#endregion
 
@@ -234,6 +219,15 @@ namespace Viper.Framework.Engine
 
 			return true;
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public String GetFinalReport()
+		{
+			return Report();
+		}
 		#endregion
 
 		#region Simulation Methods
@@ -244,9 +238,8 @@ namespace Viper.Framework.Engine
 		{
 			SystemTime = 0;
 			TargetTime = DEFAULT_MAX_TARGET_TIME;
-			ChangeFlag = false;
 			State = SimulationState.Ready;
-			CurrentTransactionNumber = 0;
+			CurrentActiveTransaction = null;
 		}
 
 		/// <summary>
@@ -256,9 +249,24 @@ namespace Viper.Framework.Engine
 		{
 			SystemTime = 0;
 			TargetTime = DEFAULT_MAX_TARGET_TIME;
-			ChangeFlag = false;
 			State = SimulationState.Ready;
-			CurrentTransactionNumber = 0;
+			CurrentActiveTransaction = null;
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Pause()
+		{
+			State = SimulationState.Paused;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void Resume()
+		{
+			if( State == SimulationState.Paused ) State = SimulationState.Running;
 		}
 
 		/// <summary>
@@ -318,9 +326,6 @@ namespace Viper.Framework.Engine
 
 			// Get first next transaction in the FEC
 			Transaction nextTransaction = m_ltFutureEventsChain.First();
-			// Update Transaction
-			nextTransaction.ScanStatus = false;
-			nextTransaction.State = TransactionState.ACTIVE;
 
 			// Update System Time
 			m_iSystemTime = nextTransaction.NextSystemTime;
@@ -338,13 +343,6 @@ namespace Viper.Framework.Engine
 			// If there are one or more transaction with the same system time
 			if( anotherTransactions.Count > 0 )
 			{
-				// Update Transactions 
-				anotherTransactions.ForEach(	delegate( Transaction t )
-												{
-													t.ScanStatus = false;
-													t.State = TransactionState.ACTIVE;
-												} );
-
 				// Add all transactions to the CEC
 				m_ltCurrentEventsChain.AddRange( anotherTransactions );
 
@@ -357,18 +355,33 @@ namespace Viper.Framework.Engine
 		/// 
 		/// </summary>
 		/// <param name="currentTransaction"></param>
-		private void MoveTransaction( Transaction currentTransaction )
+		private void MoveTransaction( Transaction oTransaction )
 		{
 			// Process next Model Block and continue until transaction change its ScanStatus 
-			BlockTransactional nextBlock = currentTransaction.NextBlock;
-			while( !currentTransaction.ScanStatus ) {
-				// Generate new transactions after current transaction leaves the generate block
-				if( currentTransaction.CurrentBlock is GenerateBlock )
-				{
-					// transaction is leaving generate block, generate new transactions
-					ScheduleNewTransactionFromGenerate( ( GenerateBlock )currentTransaction.CurrentBlock );
-				}
-				nextBlock.Process( ref currentTransaction );
+			BlockTransactional nextBlock = oTransaction.NextBlock;
+			while ( oTransaction.State == TransactionState.ACTIVE )
+			{
+				// If transaction is leaving a generate block, schedule a new transaction there
+				CheckAfterGenerate( oTransaction );
+
+				nextBlock.Process( ref oTransaction );
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		private void CheckAfterGenerate( Transaction oTransaction )
+		{
+			// Generate new transactions after current transaction leaves the generate block
+			if ( oTransaction.CurrentBlock is GenerateBlock )
+			{
+				// transaction is leaving generate block, generate new transactions
+				ScheduleNewTransactionFromGenerate( ( GenerateBlock )oTransaction.CurrentBlock );
+
+				// save current system time as mark time
+				oTransaction.MarkTime = SystemTime;
 			}
 		}
 
@@ -388,51 +401,31 @@ namespace Viper.Framework.Engine
 			// Generate First Transactions (from each Generate Block)
 			GenerateFirstTransactions();
 
-			// While Current System Time is lower than Target System Time 
+			// While Simulation is Running (Normaly or StepByStep) and Finish Conditions are not achieved
 			while( !SimulationIsFinished() && SimulationIsRunning() )
 			{
-				while(	CurrentTransactionNumber > 0 && 
-						( ( !ChangeFlag && State == SimulationState.Running ) || State == SimulationState.RunStepByStep ) && 
-						!SimulationIsFinished() )
+				while( CurrentActiveTransaction != null && SimulationIsRunning() && !SimulationIsFinished() )
 				{
-					Transaction currentTransaction = GetTransactionFromCECByNumber( CurrentTransactionNumber );
-
-					if( State == SimulationState.Running ) CurrentTransactionNumber = GetNextTransactionNumberFromCEC();
-
-					if( !currentTransaction.ScanStatus )
+					// If current transaction is Active, we try to move it to the next block
+					if ( CurrentActiveTransaction.State == TransactionState.ACTIVE )
 					{
-						MoveTransaction( currentTransaction );
+						MoveTransaction( CurrentActiveTransaction );
 					}
 					else
 					{
-						if( State == SimulationState.RunStepByStep )
-						{
-							CurrentTransactionNumber = GetNextTransactionNumberFromCEC();
-						}
+						// if not anymore (waiting in the FEC, suspended or terminated)
+						// select next transaction from CEC and set it Active
+						CurrentActiveTransaction = GetNextTransactionFromCEC();
+						if ( CurrentActiveTransaction != null ) CurrentActiveTransaction.State = TransactionState.ACTIVE;
 					}
 				}
 
-				if( !ChangeFlag && !SimulationIsFinished() && CurrentTransactionNumber == 0 && SimulationIsRunning() )
-				{
-					// Update System Time, move transactions from FEC to CEC
-					UpdateSystemTime();
+				// Update System Time, move transactions from FEC to CEC
+				UpdateSystemTime();
 
-					// Reset Change Flag (if it is ON)
-					if( ChangeFlag ) ChangeFlag = false;
-
-					// Get First Transaction from CEC
-					CurrentTransactionNumber = GetFirstTransactionNumberFromCEC();
-				}
-				else
-				{
-					if( ChangeFlag && State == SimulationState.Running )
-					{
-						ChangeFlag = false;
-
-						// Get First Transaction from CEC (if there are transactions)
-						CurrentTransactionNumber = GetFirstTransactionNumberFromCEC();
-					}
-				}
+				// Get First Transaction from the CEC and set it Active
+				CurrentActiveTransaction = GetFirstTransactionFromCEC();
+				if( CurrentActiveTransaction != null ) CurrentActiveTransaction.State = TransactionState.ACTIVE;
 			}
 
 			// Simulation Ended
@@ -451,15 +444,14 @@ namespace Viper.Framework.Engine
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="iTargetTime"></param>
 		/// <returns></returns>
 		private bool SimulationIsFinished()
 		{
-			// if target time has not been achieved and termination count is greater than zero
-			if( SystemTime <= TargetTime && TerminationCount > 0 && 
-				State != SimulationState.Finished && State != SimulationState.Error ) 
+			// if target time has not been achieved and termination count is greater than zero: not yet finished
+			if( (SystemTime <= TargetTime) && (TerminationCount > 0) ) 
 				return false;
 
+			// Otherwise, we end the simulation
 			return true;
 		}
 
@@ -489,6 +481,9 @@ namespace Viper.Framework.Engine
 		/// <param name="oTransaction"></param>
 		public void InsertTransactionIntoFEC( Transaction oTransaction )
 		{
+			// Set Transaction State to WAITING (in FEC)
+			oTransaction.State = TransactionState.WAITING;
+
 			m_ltFutureEventsChain.Add( oTransaction );
 		}
 
@@ -519,6 +514,9 @@ namespace Viper.Framework.Engine
 		/// <param name="oTransaction"></param>
 		public void InsertTransactionIntoCEC( Transaction oTransaction )
 		{
+			// Set Transaction State to WAITING (in the CEC)
+			oTransaction.State = TransactionState.WAITING;
+
 			m_ltCurrentEventsChain.Add( oTransaction );
 		}
 
@@ -535,12 +533,11 @@ namespace Viper.Framework.Engine
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public int GetFirstTransactionNumberFromCEC()
+		private Transaction GetFirstTransactionFromCEC()
 		{
-			if( m_ltCurrentEventsChain.Count == 0 ) return Constants.DEFAULT_ZERO_VALUE;
+			if( m_ltCurrentEventsChain.Count == 0 ) return null;
 
-			Transaction firstTransaction = m_ltCurrentEventsChain.OrderByDescending( t => t.Priority ).First();
-			return firstTransaction.Number;
+			return m_ltCurrentEventsChain.OrderByDescending( t => t.Priority ).First();
 		}
 
 		/// <summary>
@@ -548,7 +545,7 @@ namespace Viper.Framework.Engine
 		/// </summary>
 		/// <param name="iTransactionNumber"></param>
 		/// <returns></returns>
-		public Transaction GetTransactionFromCECByNumber( int iTransactionNumber )
+		private Transaction GetTransactionFromCECByNumber( int iTransactionNumber )
 		{
 			Transaction oTransaction = ( from t in m_ltCurrentEventsChain
 										 where t.Number == iTransactionNumber
@@ -560,18 +557,18 @@ namespace Viper.Framework.Engine
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public int GetNextTransactionNumberFromCEC()
+		public Transaction GetNextTransactionFromCEC()
 		{
 			if( m_ltCurrentEventsChain.Count > 0 )
 			{
-				Transaction oTransaction = ( from t in m_ltCurrentEventsChain
-											 where t.Number != CurrentTransactionNumber &&
-											 t.AlreadyProcessed == false
-											 select t ).OrderByDescending( t => t.Priority ).FirstOrDefault();
+				return ( from t in m_ltCurrentEventsChain
+						 where t != CurrentActiveTransaction &&
+						 t.State == TransactionState.WAITING
+						 select t ).OrderByDescending( t => t.Priority ).FirstOrDefault();
 
-				if( oTransaction != null ) return oTransaction.Number;
 			}
-			return Constants.DEFAULT_ZERO_VALUE;
+
+			return null;
 		}
 
 		/// <summary>
@@ -586,6 +583,54 @@ namespace Viper.Framework.Engine
 			if( iDecrement > 0 ) TerminationCount -= iDecrement;
 
 			return ( TerminationCount >= 0 );
+		}
+		#endregion
+
+		#region Report Methods
+		private String Report()
+		{
+			String strOutput = String.Empty;
+			strOutput = String.Concat( strOutput, "== SIMULATION RESUME ==", Environment.NewLine );
+			strOutput = String.Concat( strOutput , "FINAL SYSTEM TIME: " , this.SystemTime , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "TRANSACTIONS CREATED: " , this.TransactionCounter , Environment.NewLine );
+
+			strOutput = String.Concat( strOutput , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "== MODEL ==" , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "LINE              BLOCK                             ENTRY COUNT   CURRENT COUNT" , Environment.NewLine );
+			foreach( BlockTransactional bt in m_lbSimulationBlocks.FindAll( b => b is BlockTransactional ).ToList() )
+			{
+				strOutput = String.Concat( strOutput , bt.Line , "            " );
+				strOutput = String.Concat( strOutput , bt.Text , "                                 " );
+				strOutput = String.Concat( strOutput , bt.EntryCount , "       " );
+				strOutput = String.Concat( strOutput , bt.CurrentCount , Environment.NewLine );
+			}
+
+			strOutput = String.Concat( strOutput , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "== CURRENT EVENTS CHAIN ==" , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "TX NUM           TX TIME            CURRENT LINE            STATE" , Environment.NewLine );	
+			foreach( Transaction tx in m_ltCurrentEventsChain )
+			{
+				strOutput = String.Concat( strOutput , tx.Number , "           " );
+				strOutput = String.Concat( strOutput , Convert.ToString( this.SystemTime - tx.MarkTime ) , "              " );
+				strOutput = String.Concat( strOutput , tx.CurrentBlock.Line , "              " );
+				strOutput = String.Concat( strOutput , tx.State , Environment.NewLine );
+			}
+
+			strOutput = String.Concat( strOutput , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "== FUTURE EVENTS CHAIN ==" , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "TX NUM           NEXT TIME          CURRENT BLOCK            STATE" , Environment.NewLine );
+			foreach ( Transaction tx in m_ltFutureEventsChain )
+			{
+				strOutput = String.Concat( strOutput , tx.Number , "           " );
+				strOutput = String.Concat( strOutput , tx.NextSystemTime , "              " );
+				strOutput = String.Concat( strOutput , tx.CurrentBlock.Line , "              " );
+				strOutput = String.Concat( strOutput , tx.State , Environment.NewLine );
+			}
+
+			strOutput = String.Concat( strOutput , Environment.NewLine );
+			strOutput = String.Concat( strOutput , "== END SIMULATION RESUME ==" , Environment.NewLine );
+			
+			return strOutput;
 		}
 		#endregion
 	}

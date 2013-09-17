@@ -91,7 +91,7 @@ namespace Viper.Test
 			// State = SUSPENDED, Priority = DEFAULT (0)
 
 			// Transaction should be SUSPENDED:
-			Assert.AreEqual( TransactionState.SUSPENDED, m_oDefaultTransaction.State );
+			Assert.AreEqual( TransactionState.WAITING, m_oDefaultTransaction.State );
 		}
 
 		[TestMethod]

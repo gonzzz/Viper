@@ -13,7 +13,7 @@ namespace Viper.Framework.Blocks
 	/// <summary>
 	/// Advance Block Class. Calculate next simulation time and puts the Transaction in the FEC.
 	/// </summary>
-	public class AdvanceBlock : BlockTransactional, IParseable, IProcessable
+	public class AdvanceBlock : BlockTransactional, IParseable
 	{
 		#region Operands
 		/// <summary>
@@ -169,8 +169,6 @@ namespace Viper.Framework.Blocks
 
 				// Update Transaction Time and ScanStatus (transaction will remain in FEC until next time equal system time)
 				oTransaction.NextSystemTime = iNextTime;
-				oTransaction.State = TransactionState.PASSIVE;
-				oTransaction.ScanStatus = true;
 
 				// Remove Transaction From CEC
 				ViperSystem.Instance().RemoveTransactionFromCEC( oTransaction );

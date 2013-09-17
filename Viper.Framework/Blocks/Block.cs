@@ -18,8 +18,7 @@ namespace Viper.Framework.Blocks
 		protected String m_sBlockLabel;
 		protected int m_iBlockNumber;
 		protected String m_sBlockText;
-		protected int m_iEntryCount;
-		protected int m_iCurrentCount;
+		
 		protected bool m_bExecutable;
 		#endregion
 
@@ -68,29 +67,7 @@ namespace Viper.Framework.Blocks
 			}
 		}
 
-		/// <summary>
-		/// Returns Block Entry Count. Total number of transactions which have entered the block.
-		/// Related SNA: Nentnum. Where entnum is Block.Number property.
-		/// </summary>
-		public int EntryCount
-		{
-			get
-			{
-				return m_iEntryCount;
-			}
-		}
-
-		/// <summary>
-		/// Returns Block Current Count. Current number of transactions in the block.
-		/// Related SNA: Wentnum. Where entnum is Block.Number property.
-		/// </summary>
-		public int CurrentCount
-		{
-			get
-			{
-				return m_iCurrentCount;
-			}
-		}
+		
 
 		/// <summary>
 		/// Returns True if Block is executable by a transaction. False otherwise.
@@ -114,8 +91,6 @@ namespace Viper.Framework.Blocks
 			m_iBlockNumber = Constants.DEFAULT_ZERO_VALUE;
 			m_sBlockText = String.Empty;
 			m_sBlockLabel = String.Empty;
-			m_iEntryCount = Constants.DEFAULT_ZERO_VALUE;
-			m_iCurrentCount = Constants.DEFAULT_ZERO_VALUE;
 			m_bExecutable = false;
 		}
 
@@ -130,8 +105,6 @@ namespace Viper.Framework.Blocks
 			m_iBlockNumber = iBlockNumber;
 			m_sBlockText = sBlockText;
 			m_sBlockLabel = String.Empty;
-			m_iEntryCount = Constants.DEFAULT_ZERO_VALUE;
-			m_iCurrentCount = Constants.DEFAULT_ZERO_VALUE;
 			m_bExecutable = false;
 		}
 		#endregion
