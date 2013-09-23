@@ -154,7 +154,7 @@ namespace Viper.Framework.Blocks
 				// Common Process
 				base.Process( ref oTransaction );
 
-				// Add Transaction to Storage
+				// Add Transaction to Queue
 				queue.DoQueue( oTransaction, iAmountToQueue );
 
 				// Notify Success

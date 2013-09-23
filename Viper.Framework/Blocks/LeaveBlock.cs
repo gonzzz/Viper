@@ -58,7 +58,7 @@ namespace Viper.Framework.Blocks
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper DoLeave Block
+		/// Parse Plain Text Block and returns a Viper Leave Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()
@@ -156,7 +156,7 @@ namespace Viper.Framework.Blocks
 					throw new BlockProcessException( strMessage, null, BlockNames.LEAVE, this.Line );
 				}
 
-				// Get Amount To DoLeave
+				// Get Amount To Leave
 				int iAmountToLeave = ViperSystem.InstanceModel().GetAmountToOccupyOrLeaveInStorage( oTransaction, this.OperandB );
 
 				if( storage.IsLeaveAvailable( iAmountToLeave ) )

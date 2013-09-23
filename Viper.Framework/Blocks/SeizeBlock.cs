@@ -48,7 +48,7 @@ namespace Viper.Framework.Blocks
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper DoSeize Block
+		/// Parse Plain Text Block and returns a Viper Seize Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()

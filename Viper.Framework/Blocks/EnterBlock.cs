@@ -58,7 +58,7 @@ namespace Viper.Framework.Blocks
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper DoEnter Block
+		/// Parse Plain Text Block and returns a Viper Enter Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()

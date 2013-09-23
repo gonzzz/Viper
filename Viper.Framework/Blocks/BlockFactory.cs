@@ -313,7 +313,7 @@ namespace Viper.Framework.Blocks
 		{
 			if( sPlainTextBlock.Contains( BlockNames.ENTER ) )
 			{
-				// Create DoEnter Block with line number, block number and raw plain text
+				// Create Enter Block with line number, block number and raw plain text
 				EnterBlock oEnter = new EnterBlock( iLineNumber, ( lbViperModel.Count + 1 ), sPlainTextBlock );
 				
 				// Attach OnParseFailed Event
@@ -322,7 +322,7 @@ namespace Viper.Framework.Blocks
 				// Parse Block
 				BlockParseResult bBlockParsedResult = oEnter.Parse();
 
-				// If result is OK add DoEnter Block in Viper Model
+				// If result is OK add Enter Block in Viper Model
 				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
 				{
 					try
@@ -357,7 +357,7 @@ namespace Viper.Framework.Blocks
 		{
 			if( sPlainTextBlock.Contains( BlockNames.LEAVE ) )
 			{
-				// Create DoLeave Block with line number, block number and raw plain text
+				// Create Leave Block with line number, block number and raw plain text
 				LeaveBlock oLeave = new LeaveBlock( iLineNumber, ( lbViperModel.Count + 1 ), sPlainTextBlock );
 				
 				// Attach OnParseFailed Event
@@ -366,7 +366,7 @@ namespace Viper.Framework.Blocks
 				// Parse Block
 				BlockParseResult bBlockParsedResult = oLeave.Parse();
 
-				// If result is OK add DoLeave Block in Viper Model
+				// If result is OK add Leave Block in Viper Model
 				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
 				{
 					try
@@ -401,7 +401,7 @@ namespace Viper.Framework.Blocks
 		{
 			if( sPlainTextBlock.Contains( BlockNames.SEIZE ) )
 			{
-				// Create DoSeize Block with line number, block number and raw plain text
+				// Create Seize Block with line number, block number and raw plain text
 				SeizeBlock oSeize = new SeizeBlock( iLineNumber, ( lbViperModel.Count + 1 ), sPlainTextBlock );
 				
 				// Attach OnParseFailed Event
@@ -410,7 +410,7 @@ namespace Viper.Framework.Blocks
 				// Parse Block
 				BlockParseResult bBlockParsedResult = oSeize.Parse();
 
-				// If result is OK add DoSeize Block in Viper Model
+				// If result is OK add Seize Block in Viper Model
 				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
 				{
 					try
@@ -445,7 +445,7 @@ namespace Viper.Framework.Blocks
 		{
 			if( sPlainTextBlock.Contains( BlockNames.RELEASE ) )
 			{
-				// Create DoRelease Block with line number, block number and raw plain text
+				// Create Release Block with line number, block number and raw plain text
 				ReleaseBlock oRelease = new ReleaseBlock( iLineNumber, ( lbViperModel.Count + 1 ), sPlainTextBlock );
 				
 				// Attach OnParseFailed Event
@@ -454,7 +454,7 @@ namespace Viper.Framework.Blocks
 				// Parse Block
 				BlockParseResult bBlockParsedResult = oRelease.Parse();
 
-				// If result is OK add DoRelease Block in Viper Model
+				// If result is OK add Release Block in Viper Model
 				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) 
 				{
 					try
