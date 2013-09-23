@@ -162,7 +162,7 @@ namespace Viper.Framework.Enums
 		StorageTotalUnits = 13,
 
 		/// <summary>
-		/// S = Storage Available Units
+		/// S = Storage FreeUnits Units
 		/// </summary>
 		StorageAvailableUnits = 14,
 
@@ -202,7 +202,7 @@ namespace Viper.Framework.Enums
 		StorageAverageUsageTime = 21,
 
 		/// <summary>
-		/// SV = Storage Is Available
+		/// SV = Storage Is FreeUnits
 		/// </summary>
 		StorageIsAvailable = 22,
 
@@ -232,7 +232,7 @@ namespace Viper.Framework.Enums
 		FacilityAverageOccupationTime = 27,
 
 		/// <summary>
-		/// FV = Facility Is Available?
+		/// FV = Facility Is FreeUnits?
 		/// </summary>
 		FacilityIsAvailable = 28,
 

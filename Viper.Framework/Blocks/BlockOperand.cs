@@ -230,46 +230,6 @@ namespace Viper.Framework.Blocks
 			blockOperand.IsRequired = required;
 			return ParseOperand( operandStr, blockOperand );
 		}
-
-		/// <summary>
-		/// Returns the integer value of an Operand, whether is a positive integer or infered from a name or 
-		/// indirectly from an SNA.
-		/// </summary>
-		/// <param name="operand"></param>
-		/// <param name="strBlockName"></param>
-		/// <param name="iBlockLine"></param>
-		/// <returns></returns>
-		public static int GetIntValueFromOperand( BlockOperand operand, string strBlockName, int iBlockLine )
-		{
-			int iOperandValue = Constants.DEFAULT_ZERO_VALUE;
-			if ( operand.IsPosInteger )
-			{
-				iOperandValue = operand.PosInteger;
-			}
-			else if ( operand.IsName )
-			{
-				// TODO: Implement Name Search
-				throw new NotImplementedException();
-			}
-			else if ( operand.IsSNA )
-			{
-				// TODO: Implement SNA indirect
-				if ( operand.SNA.Type == SNAType.Function )
-				{
-					throw new NotImplementedException();
-				}
-				else if ( operand.SNA.Type == SNAType.Variable )
-				{
-					throw new NotImplementedException();
-				}
-				else
-				{
-					throw new BlockProcessException( String.Format( "Wrong SNA utilization: '{0}'." , operand.SNA.RawTextSNA ) ,
-													 null , strBlockName , iBlockLine );
-				}
-			}
-			return iOperandValue;
-		}
 		#endregion
 
 		#region Private Static Methods

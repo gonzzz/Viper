@@ -310,7 +310,7 @@ namespace Viper.Framework.Engine
 			}
 			else if( ViperSNATranslator.StartsWithSNAPrefix( parameter, SNAPrefixes.SV ) )
 			{
-				// Storage is Available
+				// Storage is FreeUnits
 				SNATranslated sna = new SNATranslated( parameter, SNAType.Storage, SNA.StorageIsAvailable );
 
 				// Get specifier
@@ -387,7 +387,7 @@ namespace Viper.Framework.Engine
 			}
 			else if ( ViperSNATranslator.StartsWithSNAPrefix( parameter , SNAPrefixes.FV ) )
 			{
-				// Facility is Available
+				// Facility is FreeUnits
 				SNATranslated sna = new SNATranslated( parameter, SNAType.Facility, SNA.FacilityIsAvailable );
 
 				// Get specifier

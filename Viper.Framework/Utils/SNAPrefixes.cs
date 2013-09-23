@@ -85,7 +85,7 @@ namespace Viper.Framework.Utils
 		public const String R = "R";
 
 		/// <summary>
-		/// Storage Available Units
+		/// Storage FreeUnits Units
 		/// </summary>
 		public const String S = "S";
 
@@ -125,7 +125,7 @@ namespace Viper.Framework.Utils
 		public const String ST = "ST";
 
 		/// <summary>
-		/// Storage is Available
+		/// Storage is FreeUnits
 		/// </summary>
 		public const String SV = "SV";
 		#endregion
@@ -157,7 +157,7 @@ namespace Viper.Framework.Utils
 		public const String FT = "FT";
 
 		/// <summary>
-		/// Facility is Available
+		/// Facility is FreeUnits
 		/// </summary>
 		public const String FV = "FV";
 		#endregion

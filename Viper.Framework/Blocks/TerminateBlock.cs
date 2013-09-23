@@ -6,10 +6,11 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
-	public class TerminateBlock : BlockTransactional, IParseable, IProcessable
+	public class TerminateBlock : BlockTransactional, IParseable
 	{
 		#region Operands
 		/// <summary>
@@ -124,22 +125,71 @@ namespace Viper.Framework.Blocks
 		#endregion
 
 		#region IProcessable Implementation
-		public BlockProcessResult Process( ref Transaction oTransaction )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <returns></returns>
+		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				int iTerminationAmount = GetTerminationAmount();
+
+				// We do common process here
+				base.Process( ref oTransaction );
+
+				if( iTerminationAmount > Constants.DEFAULT_ZERO_VALUE ) {
+					ViperSystem.Instance().DecrementTerminationCounter( iTerminationAmount );
+				}
+
+				oTransaction.State = TransactionState.TERMINATED;
+
+				// Remove Transaction From CEC
+				ViperSystem.Instance().RemoveTransactionFromCEC( oTransaction );
+
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.TERMINATE , this.Line , String.Empty ) );
+
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.TERMINATE , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 
-		public event EventHandler ProcessSuccess;
-		public event EventHandler ProcessFailed;
-
-		public void OnProcessSuccess( ProcessEventArgs eventArgs )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		private int GetTerminationAmount()
 		{
-			throw new NotImplementedException();
-		}
+			int iTerminationAmount = Constants.DEFAULT_ZERO_VALUE; // From Operand A
 
-		public void OnProcessFailed( ProcessEventArgs eventArgs )
-		{
-			throw new NotImplementedException();
+			if ( !this.OperandA.IsEmpty )
+			{
+				if( this.OperandA.IsPosInteger )
+				{
+					iTerminationAmount = this.OperandA.PosInteger;
+				}
+				else if( this.OperandA.IsName )
+				{
+					// TODO: TERMINATE NUM - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandA.IsSNA )
+				{
+					// TODO: TERMINATE NUM - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
+			}
+
+			return iTerminationAmount;
 		}
 		#endregion
 	}

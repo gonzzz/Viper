@@ -23,7 +23,7 @@ namespace Viper.Test
 
 		private TestContext testContextInstance;
 		private Transaction m_oDefaultTransaction;
-		private int m_iDefaultParameter;
+		private String m_sDefaultParameter;
 		private int m_iDefaultParameterUpdateValue;
 
 		/// <summary>
@@ -59,7 +59,7 @@ namespace Viper.Test
 		public void MyTestInitialize() 
 		{
 			m_oDefaultTransaction = new Transaction( 1 );
-			m_iDefaultParameter = 20;
+			m_sDefaultParameter = "20";
 			m_iDefaultParameterUpdateValue = 250;
 		}
 		
@@ -91,7 +91,7 @@ namespace Viper.Test
 			// State = SUSPENDED, Priority = DEFAULT (0)
 
 			// Transaction should be SUSPENDED:
-			Assert.AreEqual( TransactionState.SUSPENDED, m_oDefaultTransaction.State );
+			Assert.AreEqual( TransactionState.WAITING, m_oDefaultTransaction.State );
 		}
 
 		[TestMethod]
@@ -150,7 +150,7 @@ namespace Viper.Test
 			// Default Created transaction shouldn't have any parameter. Default parameter
 			// should be created and assigned a value of zero (0).
 
-			Assert.AreEqual( Constants.DEFAULT_ZERO_VALUE, m_oDefaultTransaction.GetParameter( m_iDefaultParameter ) );
+			Assert.AreEqual( Constants.DEFAULT_ZERO_VALUE, m_oDefaultTransaction.GetParameter( m_sDefaultParameter ) );
 		}
 
 		[TestMethod]
@@ -160,10 +160,10 @@ namespace Viper.Test
 			// value. Then it is assigned a new value of: current value + default update value.
 			// The new parameter value should be updated ok
 
-			int iCurrentParameterValue = m_oDefaultTransaction.GetParameter( m_iDefaultParameter ) + m_iDefaultParameterUpdateValue;
-			m_oDefaultTransaction.SetParameter( m_iDefaultParameter, iCurrentParameterValue ); // updates value
+			int iCurrentParameterValue = m_oDefaultTransaction.GetParameter( m_sDefaultParameter ) + m_iDefaultParameterUpdateValue;
+			m_oDefaultTransaction.SetParameter( m_sDefaultParameter, iCurrentParameterValue ); // updates value
 
-			Assert.AreEqual( iCurrentParameterValue, m_oDefaultTransaction.GetParameter( m_iDefaultParameter ) );
+			Assert.AreEqual( iCurrentParameterValue, m_oDefaultTransaction.GetParameter( m_sDefaultParameter ) );
 		}
 		#endregion
 

@@ -15,7 +15,7 @@ namespace Viper.Framework.Enums
 		/// <summary>
 		/// The transaction is waiting on the Future Events Chain or the Current Events Chain to become the active transaction.
 		/// </summary>
-		SUSPENDED = 2,
+		WAITING = 2,
 
 		/// <summary>
 		/// The transaction has come to rest in the current model on a user chain, delay chain or pending chain.

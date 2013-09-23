@@ -196,7 +196,6 @@ namespace Viper.Framework.Blocks
 
 				// Update Transaction: NextSystemTime, State and optionaly its Priority
 				oTransaction.NextSystemTime = iArrivalTime;
-				oTransaction.State = TransactionState.PASSIVE;
 				if ( iTransactionPriority > Constants.DEFAULT_ZERO_VALUE ) oTransaction.Priority = iTransactionPriority;
 
 				// Put Transaction in the FEC
@@ -231,17 +230,56 @@ namespace Viper.Framework.Blocks
 
 			if( !this.OperandA.IsEmpty )
 			{
-				iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.GENERATE, this.Line );
+				if( this.OperandA.IsPosInteger )
+				{
+					iMean = this.OperandA.PosInteger;
+				}
+				else if( this.OperandA.IsName )
+				{
+					// TODO: GENERATE MEAN - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandA.IsSNA )
+				{
+					// TODO: GENERATE MEAN - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 
 			if( !this.OperandB.IsEmpty )
 			{
-				iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB, BlockNames.GENERATE, this.Line );
+				if( this.OperandB.IsPosInteger )
+				{
+					iDesviation = this.OperandB.PosInteger;
+				}
+				else if( this.OperandB.IsName )
+				{
+					// TODO: GENERATE DESVIATION - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandB.IsSNA )
+				{
+					// TODO: GENERATE DESVIATION - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 
 			if( !this.OperandC.IsEmpty )
 			{
-				iDelayForFirstTransaction = BlockOperand.GetIntValueFromOperand( this.OperandC, BlockNames.GENERATE, this.Line );
+				if( this.OperandC.IsPosInteger )
+				{
+					iDelayForFirstTransaction = this.OperandC.PosInteger;
+				}
+				else if( this.OperandB.IsName )
+				{
+					// TODO: GENERATE DELAY FIRST TX - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandB.IsSNA )
+				{
+					// TODO: GENERATE DELAY FIRST TX - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 
 			// Calculate Arrival Time with Mean, Desviation and DelayForFirst (optional)
@@ -265,7 +303,21 @@ namespace Viper.Framework.Blocks
 			int iMaxTransactionsToGenerate = Int32.MaxValue;
 			if( !this.OperandD.IsEmpty )
 			{
-				iMaxTransactionsToGenerate = BlockOperand.GetIntValueFromOperand( this.OperandD, BlockNames.GENERATE, this.Line );
+				if( this.OperandD.IsPosInteger )
+				{
+					iMaxTransactionsToGenerate = this.OperandD.PosInteger;
+				}
+				else if( this.OperandD.IsName )
+				{
+					// TODO: GENERATE MAX TRANSACTIONS - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandD.IsSNA )
+				{
+					// TODO: GENERATE MAX TRANSACTIONS - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
+
 			}
 			return iMaxTransactionsToGenerate;
 		}
@@ -279,7 +331,20 @@ namespace Viper.Framework.Blocks
 			int iTransactionPriority = Constants.DEFAULT_ZERO_VALUE;
 			if( !this.OperandE.IsEmpty )
 			{
-				iTransactionPriority = BlockOperand.GetIntValueFromOperand( this.OperandE, BlockNames.GENERATE, this.Line );
+				if( this.OperandE.IsPosInteger )
+				{
+					iTransactionPriority = this.OperandE.PosInteger;
+				}
+				else if( this.OperandE.IsName )
+				{
+					// TODO: GENERATE TX PRIORITY - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandE.IsSNA )
+				{
+					// TODO: GENERATE TX PRIORITY - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 			return iTransactionPriority;
 		}

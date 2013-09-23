@@ -6,6 +6,7 @@ using System.Text;
 using Viper.Framework.Blocks;
 using Viper.Framework.Utils;
 using Viper.Framework.Enums;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Entities
 {
@@ -16,15 +17,17 @@ namespace Viper.Framework.Entities
 	{
 		#region Private Members
 		private int m_iNumber;
+		private int m_iPriority;
+		private int m_iMarkTime;
+		private int m_iNextTime;
 		private BlockTransactional m_oCurrentBlock;
 		private BlockTransactional m_oNextBlock;
-		private int m_iPriority;
-		private TransactionState m_tsState;
+		private TransactionState m_tsState;		
 		private bool m_bPreempted;
 		private bool m_bDelayed;
 		private bool m_bTrace;
-		private int m_iMarkTime;
-		private Dictionary<int, int> m_dParameters;
+		
+		private Dictionary<String, int> m_dParameters;
 		private List<Transaction> m_lAssemblySet;
 		#endregion
 
@@ -46,36 +49,6 @@ namespace Viper.Framework.Entities
 		}
 
 		/// <summary>
-		/// Current Block in the current model.
-		/// </summary>
-		public BlockTransactional CurrentBlock
-		{
-			get
-			{
-				return m_oCurrentBlock;
-			}
-			set
-			{
-				m_oCurrentBlock = value;
-			}
-		}
-
-		/// <summary>
-		/// Next Block in the current model.
-		/// </summary>
-		public BlockTransactional NextBlock
-		{
-			get
-			{
-				return m_oNextBlock;
-			}
-			set
-			{
-				m_oNextBlock = value;
-			}
-		}
-
-		/// <summary>
 		/// Transaction Priority set by the GENERATE block or PRIORITY block.
 		/// Related SNA: PR
 		/// </summary>
@@ -88,21 +61,6 @@ namespace Viper.Framework.Entities
 			set
 			{
 				m_iPriority = value;
-			}
-		}
-
-		/// <summary>
-		/// Current Transaction State. Can be ACTIVE, SUSPENDED, PASSIVE or TERMINATED.
-		/// </summary>
-		public TransactionState State
-		{
-			get
-			{
-				return m_tsState;
-			}
-			set
-			{
-				m_tsState = value;
 			}
 		}
 
@@ -169,21 +127,81 @@ namespace Viper.Framework.Entities
 		}
 		#endregion
 
-		#region Public Engine Control Flags Properties
+		#region Public Engine Control Properties
 		/// <summary>
-		/// 
+		/// Next System Time in Simulation Schedule
 		/// </summary>
-		public int NextSystemTime { get; set; }
+		public int NextSystemTime 
+		{ 
+			get 
+			{
+				return m_iNextTime;
+			}
+			set
+			{
+				m_iNextTime = value;
+			}
+		}
 
 		/// <summary>
-		/// 
+		/// Current Block in the current model.
 		/// </summary>
-		public bool ScanStatus { get; set; }
+		public BlockTransactional CurrentBlock
+		{
+			get
+			{
+				return m_oCurrentBlock;
+			}
+			set
+			{
+				m_oCurrentBlock = value;
+			}
+		}
 
 		/// <summary>
-		/// 
+		/// Current Transaction State. Can be ACTIVE, SUSPENDED, PASSIVE or TERMINATED.
 		/// </summary>
-		public bool AlreadyProcessed { get; set; }
+		public TransactionState State
+		{
+			get
+			{
+				return m_tsState;
+			}
+			set
+			{
+				m_tsState = value;
+			}
+		}
+
+		/// <summary>
+		/// Next Block in the current model.
+		/// </summary>
+		public BlockTransactional NextBlock
+		{
+			get
+			{
+				return m_oNextBlock;
+			}
+			set
+			{
+				m_oNextBlock = value;
+			}
+		}
+
+		/// <summary>
+		/// Returns effective Simulation Time since last MarkTime or zero if Tx has not yet arrived at the model
+		/// </summary>
+		public int SimulationTime
+		{
+			get
+			{
+				if( MarkTime > 0 )
+				{
+					return ViperSystem.Instance().SystemTime - MarkTime;
+				}
+				return MarkTime;
+			}
+		}
 		#endregion
 
 		#region Constructors
@@ -197,16 +215,14 @@ namespace Viper.Framework.Entities
 			m_iMarkTime = Constants.DEFAULT_ZERO_VALUE;
 			m_oCurrentBlock = null;
 			m_oNextBlock = null;
-			m_tsState = TransactionState.SUSPENDED;
+			m_tsState = TransactionState.WAITING;
 			m_bPreempted = false;
 			m_bDelayed = false;
 			m_bTrace = false;
-			m_dParameters = new Dictionary<int, int>();
+			m_dParameters = new Dictionary<String, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
-			ScanStatus = false;
-			AlreadyProcessed = false;
-			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
+			m_iNextTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 
 		/// <summary>
@@ -221,41 +237,39 @@ namespace Viper.Framework.Entities
 			m_iMarkTime = iMarkTime;
 			m_oCurrentBlock = null;
 			m_oNextBlock = null;
-			m_tsState = TransactionState.SUSPENDED;
+			m_tsState = TransactionState.WAITING;
 			m_bPreempted = false;
 			m_bDelayed = false;
 			m_bTrace = false;
-			m_dParameters = new Dictionary<int, int>();
+			m_dParameters = new Dictionary<String, int>();
 			m_lAssemblySet = new List<Transaction>();
 			m_lAssemblySet.Add( this );
-			ScanStatus = false;
-			AlreadyProcessed = false;
-			NextSystemTime = Constants.DEFAULT_ZERO_VALUE;
+			m_iNextTime = Constants.DEFAULT_ZERO_VALUE;
 		}
 		#endregion
 
 		#region Parameters Methods
 		/// <summary>
-		/// Creates the parameter with number iParameterNumber if it doesn't exists. Default value is zero (0).
+		/// Creates the parameter with key sParameterKey if it doesn't exists. Default value is zero (0).
 		/// </summary>
-		/// <param name="iParameterNumber"></param>
-		private void CreateParameterIfNotExists( int iParameterNumber )
+		/// <param name="sParameterKey"></param>
+		private void CreateParameterIfNotExists( String sParameterKey )
 		{
-			if( !m_dParameters.ContainsKey( iParameterNumber ) )
+			if( !m_dParameters.ContainsKey( sParameterKey ) )
 			{
-				m_dParameters.Add( iParameterNumber, Constants.DEFAULT_ZERO_VALUE );
+				m_dParameters.Add( sParameterKey, Constants.DEFAULT_ZERO_VALUE );
 			}
 		}
 
 		/// <summary>
-		/// Returns parameter iParameterNumber value.
+		/// Returns parameter's value with key sParameterKey.
 		/// </summary>
 		/// <param name="iParameterNumber"></param>
 		/// <returns></returns>
-		public int GetParameter( int iParameterNumber )
+		public int GetParameter( String sParameterKey )
 		{
-			CreateParameterIfNotExists( iParameterNumber );
-			return m_dParameters[ iParameterNumber ];
+			CreateParameterIfNotExists( sParameterKey );
+			return m_dParameters[ sParameterKey ];
 		}
 
 		/// <summary>
@@ -263,10 +277,10 @@ namespace Viper.Framework.Entities
 		/// </summary>
 		/// <param name="iParameterNumber"></param>
 		/// <param name="iParameterValue"></param>
-		public void SetParameter( int iParameterNumber, int iParameterValue )
+		public void SetParameter( String sParameterKey, int iParameterValue )
 		{
-			CreateParameterIfNotExists( iParameterNumber );
-			m_dParameters[ iParameterNumber ] = iParameterValue;
+			CreateParameterIfNotExists( sParameterKey );
+			m_dParameters[ sParameterKey ] = iParameterValue;
 		}
 		#endregion
 

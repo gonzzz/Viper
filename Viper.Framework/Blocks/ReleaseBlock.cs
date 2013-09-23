@@ -6,6 +6,7 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
@@ -22,13 +23,6 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Member
-		/// <summary>
-		/// The Facility Entity this Block is related to
-		/// </summary>
-		private Facility m_oFacilityEntity;
-		#endregion
-
 		#region Constructors
 		/// <summary>
 		/// Default Constructor
@@ -37,7 +31,6 @@ namespace Viper.Framework.Blocks
 			: base()
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
-			this.m_oFacilityEntity = null;
 		}
 
 		/// <summary>
@@ -50,13 +43,12 @@ namespace Viper.Framework.Blocks
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
-			this.m_oFacilityEntity = null;
 		}
 		#endregion
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper Release Block
+		/// Parse Plain Text Block and returns a Viper DoRelease Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()
@@ -116,29 +108,71 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Methods
-		/// <summary>
-		/// Attach the Facility Entity to the Block
-		/// </summary>
-		/// <param name="oFacility"></param>
-		public void AttachFacility( Facility oFacility )
-		{
-			m_oFacilityEntity = oFacility;
-		}
-
-		/// <summary>
-		/// Detachs the Facility Entity from the Block
-		/// </summary>
-		public void DetachFacility()
-		{
-			m_oFacilityEntity = null;
-		}
-		#endregion
-
 		#region IProcessable Implementation
 		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Get Facility Entity (by Name, Number or SNA)
+				Facility facility = ViperSystem.InstanceModel().GetFacilityFromOperands( oTransaction, this.OperandA );
+
+				if( facility.Owner != oTransaction )
+				{
+					string strMessage = String.Format( Resources.SyntaxErrorMessagesEN.EXCEPTION_FACILITY_ONLY_OWNER_TX_CAN_RELEASE, this.Line );
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish )
+						strMessage = String.Format( Resources.SyntaxErrorMessagesES.EXCEPTION_FACILITY_ONLY_OWNER_TX_CAN_RELEASE, this.Line );
+
+					throw new BlockProcessException( strMessage, null, BlockNames.RELEASE, this.Line );
+				}
+				else
+				{
+					// Common Process
+					base.Process( ref oTransaction );
+
+					// Release Facility
+					facility.DoRelease( oTransaction );
+
+					if( facility.TransactionCountInPendingChain() > 0 )
+					{
+						// Remove first transaction from Pending Chain (ordered by priority)
+						Transaction transactionFreed = facility.RemoveFirstTransactionFromPendingChain();
+
+						// Add it to the CEC (with nextsystemtime, state and isdelayed updated)
+						transactionFreed.NextSystemTime = ViperSystem.Instance().SystemTime;
+						transactionFreed.State = TransactionState.WAITING;
+						transactionFreed.IsDelayed = false;
+						transactionFreed.IsPreempted = false;
+
+						ViperSystem.Instance().InsertTransactionIntoCEC( transactionFreed );
+					}
+					else if( facility.TransactionCountInDelayChain() > 0 )
+					{
+						// Remove first transaction from Delay Chain (ordered by priority)
+						Transaction transactionFreed = facility.RemoveFirstTransactionFromDelayChain();
+
+						// Add it to the CEC (with nextsystemtime, state and isdelayed updated)
+						transactionFreed.NextSystemTime = ViperSystem.Instance().SystemTime;
+						transactionFreed.State = TransactionState.WAITING;
+						transactionFreed.IsDelayed = false;
+						transactionFreed.IsPreempted = false;
+
+						ViperSystem.Instance().InsertTransactionIntoCEC( transactionFreed );
+					}
+
+					// Notify Success
+					OnProcessSuccess( new ProcessEventArgs( BlockNames.RELEASE, this.Line, String.Empty ) );
+
+					return BlockProcessResult.TRANSACTION_PROCESSED;
+				}
+			}
+			catch( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.RELEASE, this.Line, ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 		#endregion
 	}

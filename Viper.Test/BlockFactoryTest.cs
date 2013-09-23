@@ -295,7 +295,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region Enter Block Tests
+		#region DoEnter Block Tests
 		[TestMethod]
 		public void TestEnterBlockParseWithLabelAndOperandA()
 		{
@@ -351,7 +351,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region Leave Block Tests
+		#region DoLeave Block Tests
 		[TestMethod]
 		public void TestLeaveBlockParseWithLabelAndOperandA()
 		{
@@ -407,7 +407,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region Seize Block Tests
+		#region DoSeize Block Tests
 		[TestMethod]
 		public void TestSeizeBlockParseWithLabelAndNameOperandA()
 		{
@@ -489,7 +489,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region Release Block Tests
+		#region DoRelease Block Tests
 		[TestMethod]
 		public void TestReleaseBlockParseWithLabelAndNameOperandA()
 		{

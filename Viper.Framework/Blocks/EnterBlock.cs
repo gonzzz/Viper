@@ -6,6 +6,7 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
@@ -31,13 +32,6 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Member
-		/// <summary>
-		/// The Storage Entity this Block is related to
-		/// </summary>
-		private Storage m_oStorageEntity;
-		#endregion
-
 		#region Constructors
 		/// <summary>
 		/// Default Constructor
@@ -47,7 +41,6 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 
 		/// <summary>
@@ -60,13 +53,12 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 		#endregion
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper Enter Block
+		/// Parse Plain Text Block and returns a Viper DoEnter Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()
@@ -148,29 +140,69 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Methods
-		/// <summary>
-		/// Attach the Storage Entity to the Block
-		/// </summary>
-		/// <param name="oStorage"></param>
-		public void AttachStorage( Storage oStorage )
-		{
-			m_oStorageEntity = oStorage;
-		}
-
-		/// <summary>
-		/// Detachs the Storage Entity from the Block
-		/// </summary>
-		public void DetachStorage()
-		{
-			m_oStorageEntity = null;
-		}
-		#endregion
-
 		#region IProcessable Implementation
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <returns></returns>
 		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Get Storage Entity (by Name, Number or SNA)
+				Storage storage = ViperSystem.InstanceModel().GetStorageFromOperands( oTransaction, this.OperandA );
+				if( storage == null )
+				{
+					string strMessage = Resources.SyntaxErrorMessagesEN.EXCEPTION_STORAGE_UNAVAILABLE;
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish )
+						strMessage = Resources.SyntaxErrorMessagesES.EXCEPTION_STORAGE_UNAVAILABLE;
+
+					throw new BlockProcessException( strMessage, null, BlockNames.ENTER, this.Line );
+				}
+
+				// Get Amount To Occupy
+				int iAmountToOccupy = ViperSystem.InstanceModel().GetAmountToOccupyOrLeaveInStorage( oTransaction, this.OperandB );
+
+				if( storage.IsEnterAvailable( iAmountToOccupy ) )
+				{
+					// Common Process
+					base.Process( ref oTransaction );
+
+					// Add Transaction to Storage
+					storage.DoEnter( oTransaction, iAmountToOccupy );
+
+					// Notify Success
+					OnProcessSuccess( new ProcessEventArgs( BlockNames.ENTER, this.Line, String.Empty ) );
+
+					return BlockProcessResult.TRANSACTION_PROCESSED;
+				}
+				else
+				{
+					// Update Transaction
+					oTransaction.IsDelayed = true;
+					oTransaction.State = TransactionState.PASSIVE; // will wait in Storage Delay Chain
+
+					// Add Transaction into Storage Delay Chain
+					storage.AddTransactionIntoDelayChain( oTransaction );
+
+					// Remove from the CEC
+					ViperSystem.Instance().RemoveTransactionFromCEC( oTransaction );
+
+					// Notify Failed
+					OnProcessFailed( new ProcessEventArgs( BlockNames.ENTER, this.Line, String.Empty ) );
+
+					return BlockProcessResult.TRANSACTION_ENTRY_REFUSED;
+				}
+			}
+			catch( Exception ex ) 
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.ENTER , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 		#endregion
 	}

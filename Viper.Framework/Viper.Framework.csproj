@@ -65,6 +65,7 @@
     <Compile Include="Entities\SNATranslated.cs" />
     <Compile Include="Entities\Storage.cs" />
     <Compile Include="Entities\Transaction.cs" />
+    <Compile Include="Entities\TransactionTimeOnChain.cs" />
     <Compile Include="Enums\BlockParseResult.cs" />
     <Compile Include="Enums\BlockProcessResult.cs" />
     <Compile Include="Enums\SimulationState.cs" />

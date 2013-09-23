@@ -6,6 +6,7 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
@@ -31,13 +32,6 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Member
-		/// <summary>
-		/// The Storage Entity this Block is related to
-		/// </summary>
-		private Storage m_oStorageEntity;
-		#endregion
-
 		#region Constructors
 		/// <summary>
 		/// Default Constructor
@@ -47,7 +41,6 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 
 		/// <summary>
@@ -60,13 +53,12 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 		#endregion
 
 		#region IParseable Methods
 		/// <summary>
-		/// Parse Plain Text Block and returns a Viper Leave Block
+		/// Parse Plain Text Block and returns a Viper DoLeave Block
 		/// </summary>
 		/// <returns></returns>
 		public BlockParseResult Parse()
@@ -148,29 +140,71 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Methods
-		/// <summary>
-		/// Attach the Storage Entity to the Block
-		/// </summary>
-		/// <param name="oStorage"></param>
-		public void AttachStorage( Storage oStorage )
-		{
-			m_oStorageEntity = oStorage;
-		}
-
-		/// <summary>
-		/// Detachs the Storage Entity from the Block
-		/// </summary>
-		public void DetachStorage()
-		{
-			m_oStorageEntity = null;
-		}
-		#endregion
-
 		#region IProcessable Implementation
 		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Get Storage Entity (by Name, Number or SNA)
+				Storage storage = ViperSystem.InstanceModel().GetStorageFromOperands( oTransaction, this.OperandA );
+				if( storage == null )
+				{
+					string strMessage = String.Format( Resources.SyntaxErrorMessagesEN.EXCEPTION_STORAGE_UNAVAILABLE, this.Line );
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish )
+						strMessage = String.Format( Resources.SyntaxErrorMessagesES.EXCEPTION_STORAGE_UNAVAILABLE, this.Line );
+
+					throw new BlockProcessException( strMessage, null, BlockNames.LEAVE, this.Line );
+				}
+
+				// Get Amount To DoLeave
+				int iAmountToLeave = ViperSystem.InstanceModel().GetAmountToOccupyOrLeaveInStorage( oTransaction, this.OperandB );
+
+				if( storage.IsLeaveAvailable( iAmountToLeave ) )
+				{
+					// Common Process
+					base.Process( ref oTransaction );
+
+					// Remove transaction from Storage
+					storage.DoLeave( oTransaction, iAmountToLeave );
+
+					if( storage.TransactionCountInDelayChain() > 0 )
+					{
+						for( int i = 0 ; i < iAmountToLeave ; i++ )
+						{
+							// Remove first transaction from Delay Chain (ordered by priority)
+							Transaction transactionFreed = storage.RemoveFirstTransactionFromDelayChain();
+
+							// Add it to the CEC (with nextsystemtime, state and isdelayed updated)
+							transactionFreed.NextSystemTime = ViperSystem.Instance().SystemTime;
+							transactionFreed.State = TransactionState.WAITING;
+							transactionFreed.IsDelayed = false;
+
+							ViperSystem.Instance().InsertTransactionIntoCEC( transactionFreed );
+						}
+					}
+
+					// Notify Success
+					OnProcessSuccess( new ProcessEventArgs( BlockNames.LEAVE, this.Line, String.Empty ) );
+
+					return BlockProcessResult.TRANSACTION_PROCESSED;
+				}
+				else
+				{
+					string strMessage = String.Format( Resources.SyntaxErrorMessagesEN.EXCEPTION_STORAGE_NOT_NEGATIVE, this.Line );
+					if( ViperSystem.Instance().SystemLanguage == Languages.Spanish )
+						strMessage = String.Format( Resources.SyntaxErrorMessagesES.EXCEPTION_STORAGE_NOT_NEGATIVE, this.Line );
+
+					throw new BlockProcessException( strMessage, null, BlockNames.LEAVE, this.Line );
+				}
+			}
+			catch ( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.LEAVE , this.Line , ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 		#endregion
 	}

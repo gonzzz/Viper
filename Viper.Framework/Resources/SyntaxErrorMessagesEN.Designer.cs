@@ -70,6 +70,15 @@ namespace Viper.Framework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only the Transaction owner of the facility in line {0} can release it..
+        /// </summary>
+        public static string EXCEPTION_FACILITY_ONLY_OWNER_TX_CAN_RELEASE {
+            get {
+                return ResourceManager.GetString("EXCEPTION_FACILITY_ONLY_OWNER_TX_CAN_RELEASE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transaction arrival time cannot be lower than current System Time.
         /// </summary>
         public static string EXCEPTION_GENERATE_TRANSACTION_ARRIVAL_TIME {
@@ -93,6 +102,24 @@ namespace Viper.Framework.Resources {
         public static string EXCEPTION_ON_BLOCK_PARSING_WITH_BLOCK_NAME {
             get {
                 return ResourceManager.GetString("EXCEPTION_ON_BLOCK_PARSING_WITH_BLOCK_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Storage in line {0} cannot have a negative usage..
+        /// </summary>
+        public static string EXCEPTION_STORAGE_NOT_NEGATIVE {
+            get {
+                return ResourceManager.GetString("EXCEPTION_STORAGE_NOT_NEGATIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Storage in line {0} cannot be find in the current model..
+        /// </summary>
+        public static string EXCEPTION_STORAGE_UNAVAILABLE {
+            get {
+                return ResourceManager.GetString("EXCEPTION_STORAGE_UNAVAILABLE", resourceCulture);
             }
         }
         

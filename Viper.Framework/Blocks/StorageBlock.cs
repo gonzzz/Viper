@@ -16,20 +16,13 @@ namespace Viper.Framework.Blocks
 	{
 		#region Operands
 		/// <summary>
-		/// Operand A: Total Storage Capacity
+		/// Operand A: Total Storage CapacityUnits
 		/// </summary>
 		public BlockOperand OperandA
 		{
 			get;
 			set;
 		}
-		#endregion
-
-		#region Entity Member
-		/// <summary>
-		/// The Storage Entity this Block is related to
-		/// </summary>
-		private Storage m_oStorageEntity;
 		#endregion
 
 		#region Constructors
@@ -39,7 +32,6 @@ namespace Viper.Framework.Blocks
 		public StorageBlock() : base()
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 
 		/// <summary>
@@ -51,7 +43,6 @@ namespace Viper.Framework.Blocks
 			: base( iLineNumber, iBlockNumber, sBlockText )
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
-			m_oStorageEntity = null;
 		}
 		#endregion
 
@@ -114,25 +105,6 @@ namespace Viper.Framework.Blocks
 		public void OnParseFailed( ParseEventArgs eventArgs )
 		{
 			ParseFailed( this, eventArgs );
-		}
-		#endregion
-
-		#region Entity Methods
-		/// <summary>
-		/// Attach the Storage Entity to the Block
-		/// </summary>
-		/// <param name="oStorage"></param>
-		public void AttachStorage( Storage oStorage )
-		{
-			m_oStorageEntity = oStorage;
-		}
-
-		/// <summary>
-		/// Detachs the Storage Entity from the Block
-		/// </summary>
-		public void DetachStorage()
-		{
-			m_oStorageEntity = null;
 		}
 		#endregion
 	}

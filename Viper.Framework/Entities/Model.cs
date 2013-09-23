@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Utils;
+using Viper.Framework.Blocks;
+using Viper.Framework.Enums;
 
 namespace Viper.Framework.Entities
 {
@@ -72,6 +74,86 @@ namespace Viper.Framework.Entities
 		}
 
 		/// <summary>
+		/// Get Queue entity by a block operand (Name, Number, SNA -TX indirect addressing-)
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <param name="operand"></param>
+		/// <returns></returns>
+		public Facility GetFacilityFromOperands( Transaction oTransaction, BlockOperand operand )
+		{
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsName )
+				{
+					String facilityName = String.Empty;
+					facilityName = operand.Name;
+					if( !String.IsNullOrEmpty( facilityName ) )
+					{
+						Facility theFacility = GetFacilityByName( facilityName );
+						// Facilities are not created before simulation so they should be created the first time they are entered
+						if( theFacility == null )
+						{
+							theFacility = new Facility( facilityName );
+							AddFacility( theFacility );
+						}
+						return theFacility;
+					}
+				}
+				else if( operand.IsPosInteger )
+				{
+					int iFacilityNumber = Constants.DEFAULT_ZERO_VALUE;
+					iFacilityNumber = operand.PosInteger;
+					if( iFacilityNumber > Constants.DEFAULT_ZERO_VALUE )
+					{
+						Facility theFacility = GetFacilityByNumber( iFacilityNumber );
+						// Facilities are not created before simulation so they should be created the first time they are entered
+						if( theFacility == null )
+						{
+							theFacility = new Facility( String.Format( "FACILITY_{0}", iFacilityNumber ) );
+							AddFacility( theFacility );
+						}
+						return theFacility;
+					}
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get Storage Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							int iFacilityNumber = Constants.DEFAULT_ZERO_VALUE;
+							iFacilityNumber = oTransaction.GetParameter( sParameterValue );
+							if( iFacilityNumber > Constants.DEFAULT_ZERO_VALUE )
+							{
+								Facility theFacility = GetFacilityByNumber( iFacilityNumber );
+								// Facilities are not created before simulation so they should be created the first time they are entered
+								if( theFacility == null )
+								{
+									theFacility = new Facility( String.Format( "FACILITY_{0}", iFacilityNumber ) );
+									AddFacility( theFacility );
+								}
+								return theFacility;
+							}
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public List<Facility> GetFacilities()
+		{
+			return m_oFacilities;
+		}
+
+		/// <summary>
 		/// Clear All Facilities in the Model
 		/// </summary>
 		public void ClearFacilities()
@@ -92,6 +174,15 @@ namespace Viper.Framework.Entities
 		public void RemoveAllFacilities()
 		{
 			m_oFacilities.Clear();
+		}
+
+		/// <summary>
+		/// Returns Facilities Count
+		/// </summary>
+		/// <returns></returns>
+		public int FacilitiesCount()
+		{
+			return m_oFacilities.Count;
 		}
 		#endregion
 
@@ -140,6 +231,15 @@ namespace Viper.Framework.Entities
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public List<Storage> GetStorages()
+		{
+			return m_oStorages;
+		}
+
+		/// <summary>
 		/// Returns the total number of Storages in the Model
 		/// </summary>
 		/// <returns></returns>
@@ -169,6 +269,86 @@ namespace Viper.Framework.Entities
 		public void RemoveAllStorages()
 		{
 			m_oStorages.Clear();
+		}
+
+		/// <summary>
+		/// Get Storage entity by a block operand (Name, Number, SNA -TX indirect addressing-)
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <param name="operand"></param>
+		/// <returns></returns>
+		public Storage GetStorageFromOperands( Transaction oTransaction, BlockOperand operand )
+		{
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsName )
+				{
+					String storageName = String.Empty;
+					storageName = operand.Name;
+					if( !String.IsNullOrEmpty( storageName ) )
+					{
+						return GetStorageByName( storageName );
+					}
+				}
+				else if( operand.IsPosInteger )
+				{
+					int iStorageNumber = Constants.DEFAULT_ZERO_VALUE;
+					iStorageNumber = operand.PosInteger;
+					if( iStorageNumber > Constants.DEFAULT_ZERO_VALUE )
+					{
+						return GetStorageByNumber( iStorageNumber );
+					}
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get Storage Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							int iStorageNumber = Constants.DEFAULT_ZERO_VALUE;
+							iStorageNumber = oTransaction.GetParameter( sParameterValue );
+							if( iStorageNumber > Constants.DEFAULT_ZERO_VALUE )
+							{
+								return GetStorageByNumber( iStorageNumber );
+							}
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public int GetAmountToOccupyOrLeaveInStorage( Transaction oTransaction, BlockOperand operand )
+		{
+			int iAmountToOccupyOrLeave = Storage.DEFAULT_OCCUPY_AMOUNT;
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsPosInteger )
+				{
+					iAmountToOccupyOrLeave = operand.PosInteger;
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get Storage Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							iAmountToOccupyOrLeave = oTransaction.GetParameter( sParameterValue );
+						}
+					}
+				}
+			}
+
+			return iAmountToOccupyOrLeave;
 		}
 		#endregion
 
@@ -217,6 +397,15 @@ namespace Viper.Framework.Entities
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public List<Queue> GetQueues()
+		{
+			return m_oQueues;
+		}
+
+		/// <summary>
 		/// Clear All Queues in the Model
 		/// </summary>
 		public void ClearQueues()
@@ -237,6 +426,116 @@ namespace Viper.Framework.Entities
 		public void RemoveAllQueues()
 		{
 			m_oQueues.Clear();
+		}
+
+		/// <summary>
+		/// Returns Queues count
+		/// </summary>
+		/// <returns></returns>
+		public int QueuesCount()
+		{
+			return m_oQueues.Count;
+		}
+
+		/// <summary>
+		/// Get Queue entity by a block operand (Name, Number, SNA -TX indirect addressing-)
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <param name="operand"></param>
+		/// <returns></returns>
+		public Queue GetQueueFromOperands( Transaction oTransaction, BlockOperand operand )
+		{
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsName )
+				{
+					String queueName = String.Empty;
+					queueName = operand.Name;
+					if( !String.IsNullOrEmpty( queueName ) )
+					{
+						Queue theQueue = GetQueueByName( queueName );
+						// Queues are not created before simulation so they should be created the first time they are entered
+						if( theQueue == null ) 
+						{
+							theQueue = new Queue( queueName );
+							AddQueue( theQueue );
+						}
+						return theQueue;
+					}
+				}
+				else if( operand.IsPosInteger )
+				{
+					int iQueueNumber = Constants.DEFAULT_ZERO_VALUE;
+					iQueueNumber = operand.PosInteger;
+					if( iQueueNumber > Constants.DEFAULT_ZERO_VALUE )
+					{
+						Queue theQueue = GetQueueByNumber( iQueueNumber );
+						// Queues are not created before simulation so they should be created the first time they are entered
+						if( theQueue == null )
+						{
+							theQueue = new Queue( String.Format( "QUEUE_{0}", iQueueNumber ) );
+							AddQueue( theQueue );
+						}
+						return theQueue;
+					}
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get Storage Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							int iQueueNumber = Constants.DEFAULT_ZERO_VALUE;
+							iQueueNumber = oTransaction.GetParameter( sParameterValue );
+							if( iQueueNumber > Constants.DEFAULT_ZERO_VALUE )
+							{
+								Queue theQueue = GetQueueByNumber( iQueueNumber );
+								// Queues are not created before simulation so they should be created the first time they are entered
+								if( theQueue == null )
+								{
+									theQueue = new Queue( String.Format( "QUEUE_{0}", iQueueNumber ) );
+									AddQueue( theQueue );
+								}
+								return theQueue;
+							}
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public int GetAmountToQueueOrDequeueFromQueue( Transaction oTransaction, BlockOperand operand )
+		{
+			int iAmountToQueueOrDequeue = Queue.DEFAULT_QUEUE_AMOUNT;
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsPosInteger )
+				{
+					iAmountToQueueOrDequeue = operand.PosInteger;
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get Storage Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							iAmountToQueueOrDequeue = oTransaction.GetParameter( sParameterValue );
+						}
+					}
+				}
+			}
+
+			return iAmountToQueueOrDequeue;
 		}
 		#endregion
 	}

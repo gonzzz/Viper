@@ -133,17 +133,8 @@ namespace Viper.Test
 					StorageBlock storageBlock = block as StorageBlock;
 
 					// Create new Storage in Model with Storage Block parameters
-					Storage newStorage = new Storage( storageBlock.Label );
-					if( storageBlock.OperandA.IsPosInteger ) {
-						newStorage.Capacity = storageBlock.OperandA.PosInteger;
-						newStorage.Available = newStorage.Capacity;
-					} else {
-						// Todo: if operandA isName we should search for VARIABLE, FVARIABLE or EQU blocks
-					}
+					Storage newStorage = new Storage( storageBlock.Label, storageBlock.OperandA.PosInteger );
 					oModel.AddStorage( newStorage );
-
-					// Attach Storage Entity to Storage Block
-					storageBlock.AttachStorage( oModel.GetStorageByName( storageBlock.Label ) );
 				}
 			}
 

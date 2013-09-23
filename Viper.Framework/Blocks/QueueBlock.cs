@@ -6,6 +6,7 @@ using Viper.Framework.Utils;
 using Viper.Framework.Exceptions;
 using Viper.Framework.Enums;
 using Viper.Framework.Entities;
+using Viper.Framework.Engine;
 
 namespace Viper.Framework.Blocks
 {
@@ -31,13 +32,6 @@ namespace Viper.Framework.Blocks
 		}
 		#endregion
 
-		#region Entity Member
-		/// <summary>
-		/// The Queue Entity this Block is related to
-		/// </summary>
-		private Viper.Framework.Entities.Queue m_oQueueEntity;
-		#endregion
-
 		#region Constructors
 		/// <summary>
 		/// Default Constructors
@@ -47,7 +41,6 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oQueueEntity = null;
 		}
 
 		/// <summary>
@@ -61,7 +54,6 @@ namespace Viper.Framework.Blocks
 		{
 			this.OperandA = BlockOperand.EmptyOperand();
 			this.OperandB = BlockOperand.EmptyOperand();
-			m_oQueueEntity = null;
 		}
 		#endregion
 
@@ -148,29 +140,36 @@ namespace Viper.Framework.Blocks
 
 		#endregion
 
-		#region Entity Methods
-		/// <summary>
-		/// Attach the Queue Entity to the Block
-		/// </summary>
-		/// <param name="oQueue"></param>
-		public void AttachQueue( Viper.Framework.Entities.Queue oQueue )
-		{
-			m_oQueueEntity = oQueue;
-		}
-
-		/// <summary>
-		/// Detachs the Queue Entity from the Block
-		/// </summary>
-		public void DetachQueue()
-		{
-			m_oQueueEntity = null;
-		}
-		#endregion
-
 		#region IProcessable Implementation
 		public override BlockProcessResult Process( ref Transaction oTransaction )
 		{
-			throw new NotImplementedException();
+			try
+			{
+				// Get Queue Entity (by Name, Number or SNA)
+				Queue queue = ViperSystem.InstanceModel().GetQueueFromOperands( oTransaction, this.OperandA );
+				
+				// Get Amount To Occupy
+				int iAmountToQueue = ViperSystem.InstanceModel().GetAmountToQueueOrDequeueFromQueue( oTransaction, this.OperandB );
+
+				// Common Process
+				base.Process( ref oTransaction );
+
+				// Add Transaction to Storage
+				queue.DoQueue( oTransaction, iAmountToQueue );
+
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.QUEUE, this.Line, String.Empty ) );
+
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.QUEUE, this.Line, ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
 		}
 		#endregion
 	}

@@ -13,7 +13,7 @@ namespace Viper.Framework.Blocks
 	/// <summary>
 	/// Advance Block Class. Calculate next simulation time and puts the Transaction in the FEC.
 	/// </summary>
-	public class AdvanceBlock : BlockTransactional, IParseable, IProcessable
+	public class AdvanceBlock : BlockTransactional, IParseable
 	{
 		#region Operands
 		/// <summary>
@@ -169,8 +169,6 @@ namespace Viper.Framework.Blocks
 
 				// Update Transaction Time and ScanStatus (transaction will remain in FEC until next time equal system time)
 				oTransaction.NextSystemTime = iNextTime;
-				oTransaction.State = TransactionState.PASSIVE;
-				oTransaction.ScanStatus = true;
 
 				// Remove Transaction From CEC
 				ViperSystem.Instance().RemoveTransactionFromCEC( oTransaction );
@@ -207,12 +205,38 @@ namespace Viper.Framework.Blocks
 
 			if( !this.OperandA.IsEmpty )
 			{
-				iMean = BlockOperand.GetIntValueFromOperand( this.OperandA, BlockNames.ADVANCE, this.Line );
+				if( this.OperandA.IsPosInteger )
+				{
+					iMean = this.OperandA.PosInteger;
+				}
+				else if( this.OperandA.IsName )
+				{
+					// TODO: ADVANCE MEAN - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandA.IsSNA )
+				{
+					// TODO: ADVANCE MEAN - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 
 			if( !this.OperandB.IsEmpty )
 			{
-				iDesviation = BlockOperand.GetIntValueFromOperand( this.OperandB, BlockNames.ADVANCE, this.Line );
+				if( this.OperandB.IsPosInteger )
+				{
+					iDesviation = this.OperandB.PosInteger;
+				}
+				else if( this.OperandB.IsName )
+				{
+					// TODO: ADVANCE DESVIATION - USE NAME TO GET VALUE
+					throw new NotImplementedException();
+				}
+				else if( this.OperandB.IsSNA )
+				{
+					// TODO: ADVANCE DESVIATION - USE SNA TO GET VALUE
+					throw new NotImplementedException();
+				}
 			}
 
 			// Calculate Next Transaction Time with Mean, Desviation

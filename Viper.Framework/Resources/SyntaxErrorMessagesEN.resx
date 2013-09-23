@@ -120,6 +120,9 @@
   <data name="EXCEPTION_ADVANCE_TRANSACTION_NEXT_TIME" xml:space="preserve">
     <value>Transaction next time cannot be lower than current System Time</value>
   </data>
+  <data name="EXCEPTION_FACILITY_ONLY_OWNER_TX_CAN_RELEASE" xml:space="preserve">
+    <value>Only the Transaction owner of the facility in line {0} can release it.</value>
+  </data>
   <data name="EXCEPTION_GENERATE_TRANSACTION_ARRIVAL_TIME" xml:space="preserve">
     <value>Transaction arrival time cannot be lower than current System Time</value>
   </data>
@@ -128,6 +131,12 @@
   </data>
   <data name="EXCEPTION_ON_BLOCK_PARSING_WITH_BLOCK_NAME" xml:space="preserve">
     <value>An exception has occurred parsing block '{0}' in line {1}. Message: {2}.</value>
+  </data>
+  <data name="EXCEPTION_STORAGE_NOT_NEGATIVE" xml:space="preserve">
+    <value>The Storage in line {0} cannot have a negative usage.</value>
+  </data>
+  <data name="EXCEPTION_STORAGE_UNAVAILABLE" xml:space="preserve">
+    <value>The Storage in line {0} cannot be find in the current model.</value>
   </data>
   <data name="INVALID_OR_NOT_SUPPORTED_BLOCK" xml:space="preserve">
     <value>The block in line {0} is invalid or not supported by Viper. Please proceed to fix it to continue with the creation of the simulation model. </value>
