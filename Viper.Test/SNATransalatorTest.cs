@@ -15,9 +15,9 @@ namespace Viper.Test
 	/// Summary description for SNATransalatorTest
 	/// </summary>
 	[TestClass]
-	public class SNATransalatorTest
+	public class SNATranslatorTest
 	{
-		public SNATransalatorTest()
+		public SNATranslatorTest()
 		{
 			//
 			// TODO: Add constructor logic here

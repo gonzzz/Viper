@@ -50,6 +50,7 @@
     <Compile Include="Blocks\IParseable.cs" />
     <Compile Include="Blocks\IProcessable.cs" />
     <Compile Include="Blocks\LeaveBlock.cs" />
+    <Compile Include="Blocks\PriorityBlock.cs" />
     <Compile Include="Blocks\QueueBlock.cs" />
     <Compile Include="Blocks\ReleaseBlock.cs" />
     <Compile Include="Blocks\SeizeBlock.cs" />
