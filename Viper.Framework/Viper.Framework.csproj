@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Blocks\AdvanceBlock.cs" />
+    <Compile Include="Blocks\AssignBlock.cs" />
     <Compile Include="Blocks\Block.cs" />
     <Compile Include="Blocks\BlockOperand.cs" />
     <Compile Include="Blocks\BlockTransactional.cs" />
