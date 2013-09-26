@@ -101,6 +101,9 @@ namespace Viper.Framework.Blocks
 						// Check if it is a DEPART Block
 						if( IsDepartBlock( lbViperModel, iLineNumber, sPlainModelBlock ) != BlockParseResult.NOT_PARSED ) continue;
 						
+						// Check if it is a PRIORITY Block
+						if( IsPriorityBlock( lbViperModel, iLineNumber, sPlainModelBlock ) != BlockParseResult.NOT_PARSED ) continue;
+
 						// If it arrives here it not a valid or supported block
 						HandleInvalidOrNotSupportedBlockError( iLineNumber );
 					}
@@ -567,6 +570,50 @@ namespace Viper.Framework.Blocks
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="lbViperModel"></param>
+		/// <param name="iLineNumber"></param>
+		/// <param name="sPlainTextBlock"></param>
+		/// <returns></returns>
+		private BlockParseResult IsPriorityBlock( List<Block> lbViperModel , int iLineNumber , String sPlainTextBlock )
+		{
+			if( sPlainTextBlock.Contains( BlockNames.PRIORITY ) )
+			{
+				// Create Depart Block with line number, block number and raw plain text
+				PriorityBlock oPriority = new PriorityBlock( iLineNumber , ( lbViperModel.Count + 1 ) , sPlainTextBlock );
+
+				// Attach OnParseFailed Event
+				oPriority.ParseFailed += new EventHandler( OnParseFailed );
+
+				// Parse Block
+				BlockParseResult bBlockParsedResult = oPriority.Parse();
+
+				// If result is OK add Depart Block in Viper Model
+				if ( bBlockParsedResult == BlockParseResult.PARSED_OK )
+				{
+					try
+					{
+						SetPreviousAndNextBlock( lbViperModel , oPriority );
+					}
+					catch ( BlockIntegrityException ex )
+					{
+						HandleException( BlockNames.DEPART , iLineNumber , ex.Message );
+					}
+					lbViperModel.Add( oPriority );
+				}
+
+				// Detach OnParseFailed Event
+				oPriority.ParseFailed -= OnParseFailed;
+
+				// Return Parse Result
+				return bBlockParsedResult;
+			}
+
+			return BlockParseResult.NOT_PARSED;
+		}
+
+		/// <summary>
 		/// On Block Parse Failed
 		/// </summary>
 		/// <param name="sender"></param>
@@ -667,7 +714,7 @@ namespace Viper.Framework.Blocks
 				}
 				else
 				{
-					List<Block> lbTransactionalBlocks = lbViperModel.FindAll( b => b.Executable );
+					List<Block> lbTransactionalBlocks = lbViperModel.FindAll( b => b is BlockTransactional );
 					if ( lbTransactionalBlocks.Count > 0 )
 					{
 						throw new BlockIntegrityException( "Non-Transactional Blocks cannot be used between transactional blocks", null, String.Empty, oBlock.Line );

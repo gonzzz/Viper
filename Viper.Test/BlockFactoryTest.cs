@@ -407,7 +407,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region DoSeize Block Tests
+		#region Seize Block Tests
 		[TestMethod]
 		public void TestSeizeBlockParseWithLabelAndNameOperandA()
 		{
