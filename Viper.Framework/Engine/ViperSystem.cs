@@ -340,6 +340,39 @@ namespace Viper.Framework.Engine
 					Storage newStorage = new Storage( storageBlock.Label, Convert.ToInt32( storageBlock.OperandA.PosInteger ) );
 					Model.AddStorage( newStorage );
 				}
+				else if( block is InitialBlock )
+				{
+					InitialBlock initialBlock = block as InitialBlock;
+
+					if( initialBlock.OperandA.IsSNA )
+					{
+						SNATranslated initialSNA = initialBlock.OperandA.SNA;
+
+						if( initialSNA.Type == SNAType.LogicSwitch )
+						{
+							// Create and initializes new LogicSwitch in Model with Initial Block parameters
+							// TODO: Create LogicSwith Entity object and add it to the Model
+						}
+						else if ( initialSNA.Type == SNAType.SaveValue ) 
+						{
+							// Create and initializes new SaveValue in Model with Initial Block parameters
+							// TODO: Create SaveValue Entity object and add it to the Model
+						}
+						else if ( initialSNA.Type == SNAType.MatrixSaveValue )
+						{
+							// Initializes Matrix SaveValue entity (Matrix must have been created before this)
+							// TODO: Create Matrix Entity object before this, get element and initialize it
+						}
+						else
+						{
+							// Wrong SNA (should be handle after Parse process)
+						}
+					}
+					else
+					{
+						// Wront Initial Block (should be handle after Parse process)
+					}
+				}
 			}
 		}
 

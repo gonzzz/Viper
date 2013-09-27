@@ -10,7 +10,7 @@ using Viper.Framework.Entities;
 namespace Viper.Framework.Blocks
 {
 	/// <summary>
-	/// 
+	/// Storage Block. Initializes a Storage entity.
 	/// </summary>
 	public class StorageBlock : Block, IParseable
 	{
