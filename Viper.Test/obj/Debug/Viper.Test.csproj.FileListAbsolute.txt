@@ -1,0 +1,7 @@
+C:\Viper\Viper.Test\bin\Debug\Viper.Test.dll
+C:\Viper\Viper.Test\bin\Debug\Viper.Test.pdb
+C:\Viper\Viper.Test\bin\Debug\Viper.Framework.dll
+C:\Viper\Viper.Test\bin\Debug\Viper.Framework.pdb
+C:\Viper\Viper.Test\obj\Debug\Viper.Test.csprojResolveAssemblyReference.cache
+C:\Viper\Viper.Test\obj\Debug\Viper.Test.dll
+C:\Viper\Viper.Test\obj\Debug\Viper.Test.pdb
