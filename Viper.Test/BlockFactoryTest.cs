@@ -295,7 +295,87 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region DoEnter Block Tests
+		#region Initial Block Tests
+		[TestMethod]
+		public void TestInitialBlockParseWitLogicSwitchOperandAAndPosIntegerOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL LS2,1";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.LogicSwitch );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsPosInteger && oInitial.OperandA.SNA.Parameter.Value.Equals("2") );
+			Assert.AreEqual( 1 , oInitial.OperandB.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestInitialBlockParseWitLogicSwitchOperandAAndNameOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL LS$PUERTA,PRENDIDO";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.LogicSwitch );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsName && oInitial.OperandA.SNA.Parameter.Value.Equals( "PUERTA" ) );
+			Assert.AreEqual( "PRENDIDO" , oInitial.OperandB.Name );
+		}
+
+		[TestMethod]
+		public void TestInitialBlockParseWitSaveValueOperandAAndPosIntegerOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL X5,1";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.SaveValue );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsPosInteger && oInitial.OperandA.SNA.Parameter.Value.Equals( "5" ) );
+			Assert.AreEqual( 1 , oInitial.OperandB.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestInitialBlockParseWitSaveValueOperandAAndNameOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL X$POSICION,ARRIBA";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.SaveValue );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsName && oInitial.OperandA.SNA.Parameter.Value.Equals( "POSICION" ) );
+			Assert.AreEqual( "ARRIBA" , oInitial.OperandB.Name );
+		}
+
+		[TestMethod]
+		public void TestInitialBlockParseWitMatrixSaveValueOperandAAndPosIntegerOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL MX1(0,0),10";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.MatrixSaveValue );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsPosInteger && oInitial.OperandA.SNA.Parameter.Value.Equals( "1" ) );
+			Assert.AreEqual( 10 , oInitial.OperandB.PosInteger );
+		}
+
+		[TestMethod]
+		public void TestInitialBlockParseWitMatrixSaveValueOperandAAndNameOperandB()
+		{
+			String sInitialPlainTextBlock = "	INITIAL MX$RESULTADOS(10,PRIMERO),DESCONOCIDO";
+
+			InitialBlock oInitial = new InitialBlock( 3 , 3 , sInitialPlainTextBlock );
+
+			Assert.IsTrue( oInitial.Parse() == BlockParseResult.PARSED_OK );
+			Assert.IsTrue( oInitial.OperandA.IsSNA && oInitial.OperandA.SNA.Type == SNAType.MatrixSaveValue );
+			Assert.IsTrue( oInitial.OperandA.SNA.Parameter.IsName && oInitial.OperandA.SNA.Parameter.Value.Equals( "RESULTADOS" ) );
+			Assert.AreEqual( "DESCONOCIDO" , oInitial.OperandB.Name );
+		}
+		#endregion
+
+		#region Enter Block Tests
 		[TestMethod]
 		public void TestEnterBlockParseWithLabelAndOperandA()
 		{
@@ -351,7 +431,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region DoLeave Block Tests
+		#region Leave Block Tests
 		[TestMethod]
 		public void TestLeaveBlockParseWithLabelAndOperandA()
 		{
@@ -489,7 +569,7 @@ namespace Viper.Test
 		}
 		#endregion
 
-		#region DoRelease Block Tests
+		#region Release Block Tests
 		[TestMethod]
 		public void TestReleaseBlockParseWithLabelAndNameOperandA()
 		{

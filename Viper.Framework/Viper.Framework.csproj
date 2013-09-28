@@ -48,6 +48,7 @@
     <Compile Include="Blocks\DepartBlock.cs" />
     <Compile Include="Blocks\EnterBlock.cs" />
     <Compile Include="Blocks\GenerateBlock.cs" />
+    <Compile Include="Blocks\InitialBlock.cs" />
     <Compile Include="Blocks\IParseable.cs" />
     <Compile Include="Blocks\IProcessable.cs" />
     <Compile Include="Blocks\LeaveBlock.cs" />
