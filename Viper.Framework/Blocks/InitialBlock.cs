@@ -131,7 +131,11 @@ namespace Viper.Framework.Blocks
 							|| this.OperandA.SNA.Type == SNAType.SaveValue 
 							|| this.OperandA.SNA.Type == SNAType.MatrixSaveValue 
 							)
-						 ) 
+							&& 
+							( !this.OperandA.SNA.Parameter.IndirectAddressing )
+						 )
+						 &&
+						 ( this.OperandB.IsEmpty || (!this.OperandB.IsEmpty && !this.OperandB.IsSNA) )
 						)
 						return BlockParseResult.PARSED_OK;
 				} 

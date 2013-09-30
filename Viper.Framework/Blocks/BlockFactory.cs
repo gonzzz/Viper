@@ -83,6 +83,9 @@ namespace Viper.Framework.Blocks
 						// Check if it is a STORAGE Block
 						if( IsStorageBlock( lbViperModel, iLineNumber, sPlainModelBlock ) != BlockParseResult.NOT_PARSED ) continue;
 
+						// Check if it is a INITIAL Block
+						if( IsInitialBlock( lbViperModel, iLineNumber, sPlainModelBlock ) != BlockParseResult.NOT_PARSED ) continue;
+
 						// Check if it is a ENTER Block
 						if( IsEnterBlock( lbViperModel, iLineNumber, sPlainModelBlock ) != BlockParseResult.NOT_PARSED ) continue;
 
@@ -297,6 +300,39 @@ namespace Viper.Framework.Blocks
 
 				// Detach OnParseFailed Event
 				oStorage.ParseFailed -= OnParseFailed;
+
+				// Return Parse Result
+				return bBlockParsedResult;
+			}
+
+			return BlockParseResult.NOT_PARSED;
+		}
+
+		/// <summary>
+		/// Tries to Parse a INITIAL Block
+		/// </summary>
+		/// <param name="lbViperModel"></param>
+		/// <param name="iLineNumber"></param>
+		/// <param name="sPlainTextBlock"></param>
+		/// <returns></returns>
+		private BlockParseResult IsInitialBlock( List<Block> lbViperModel, int iLineNumber, String sPlainTextBlock )
+		{
+			if( sPlainTextBlock.Contains( BlockNames.INITIAL ) )
+			{
+				// Create Initial Block with line number, block number and raw plain text
+				InitialBlock oInitial = new InitialBlock( iLineNumber, ( lbViperModel.Count + 1 ), sPlainTextBlock );
+
+				// Attach OnParseFailed Event
+				oInitial.ParseFailed += new EventHandler( OnParseFailed );
+
+				// Parse Block
+				BlockParseResult bBlockParsedResult = oInitial.Parse();
+
+				// If result is OK add Storage Block in Viper Model
+				if( bBlockParsedResult == BlockParseResult.PARSED_OK ) lbViperModel.Add( oInitial );
+
+				// Detach OnParseFailed Event
+				oInitial.ParseFailed -= OnParseFailed;
 
 				// Return Parse Result
 				return bBlockParsedResult;

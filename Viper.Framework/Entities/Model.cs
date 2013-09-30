@@ -18,6 +18,8 @@ namespace Viper.Framework.Entities
 		private List<Facility> m_oFacilities;
 		private List<Storage> m_oStorages;
 		private List<Queue> m_oQueues;
+		private List<SaveValue> m_oSaveValues;
+		private List<LogicSwitch> m_oLogicSwitches;
 		#endregion
 
 		#region Constructors
@@ -26,6 +28,8 @@ namespace Viper.Framework.Entities
 			m_oFacilities = new List<Facility>();
 			m_oStorages = new List<Storage>();
 			m_oQueues = new List<Queue>();
+			m_oSaveValues = new List<SaveValue>();
+			m_oLogicSwitches = new List<LogicSwitch>();
 		}
 		#endregion
 
@@ -536,6 +540,287 @@ namespace Viper.Framework.Entities
 			}
 
 			return iAmountToQueueOrDequeue;
+		}
+		#endregion
+
+		#region SaveValue Methods
+		public void AddSaveValue( SaveValue oSaveValue )
+		{
+			if( !String.IsNullOrEmpty( oSaveValue.Name ) ) {
+				if( GetSaveValueByName( oSaveValue.Name ) != null )
+				{
+					throw new ModelIntegrityException( "SaveValue with the same name already exists in the model" );
+				}
+			}
+			if( oSaveValue.Number != Constants.DEFAULT_ZERO_VALUE )
+			{
+				if( GetSaveValueByNumber( oSaveValue.Number ) != null )
+				{
+					throw new ModelIntegrityException( "SaveValue with the same number already exists in the model" );
+				}
+			}
+
+			m_oSaveValues.Add( oSaveValue );
+		}
+
+		/// <summary>
+		/// Gets SaveValue Entity by its Name
+		/// </summary>
+		/// <param name="sName"></param>
+		/// <returns></returns>
+		public SaveValue GetSaveValueByName( String sName )
+		{
+			SaveValue oSaveValue = ( from sv in m_oSaveValues
+									 where sv.Name.Equals( sName )
+									 select sv ).SingleOrDefault();
+
+			return oSaveValue;
+		}
+
+		/// <summary>
+		/// Gets SaveValue Entity by its number
+		/// </summary>
+		/// <param name="iNumber"></param>
+		/// <returns></returns>
+		public SaveValue GetSaveValueByNumber( int iNumber )
+		{
+			SaveValue oSaveValue = ( from sv in m_oSaveValues
+									 where sv.Number == iNumber
+									 select sv ).SingleOrDefault();
+
+			return oSaveValue;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public List<SaveValue> GetSaveValues()
+		{
+			return m_oSaveValues;
+		}
+
+		/// <summary>
+		/// Clear All SaveValues in the Model
+		/// </summary>
+		public void ClearSaveValues()
+		{
+
+		}
+
+		/// <summary>
+		/// Reset All SaveValues in the Model
+		/// </summary>
+		public void ResetSaveValues()
+		{
+		}
+
+		/// <summary>
+		/// Removes all SaveValues from Model
+		/// </summary>
+		public void RemoveAllSaveValues()
+		{
+			m_oSaveValues.Clear();
+		}
+
+		/// <summary>
+		/// Returns SaveValues count
+		/// </summary>
+		/// <returns></returns>
+		public int SaveValuesCount()
+		{
+			return m_oSaveValues.Count;
+		}
+
+		/// <summary>
+		/// Get SaveValue entity by a block operand (Name, Number, SNA -TX indirect addressing-)
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <param name="operand"></param>
+		/// <returns></returns>
+		public SaveValue GetSaveValueFromOperands( Transaction oTransaction, BlockOperand operand )
+		{
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsName )
+				{
+					String savevalueName = String.Empty;
+					savevalueName = operand.Name;
+					if( !String.IsNullOrEmpty( savevalueName ) )
+					{
+						return GetSaveValueByName( savevalueName );
+					}
+				}
+				else if( operand.IsPosInteger )
+				{
+					int iSavevalueNumber = Constants.DEFAULT_ZERO_VALUE;
+					iSavevalueNumber = operand.PosInteger;
+					if( iSavevalueNumber > Constants.DEFAULT_ZERO_VALUE )
+					{
+						return GetSaveValueByNumber( iSavevalueNumber );
+					}
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get SaveValue Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							int iSavevalueNumber = Constants.DEFAULT_ZERO_VALUE;
+							iSavevalueNumber = oTransaction.GetParameter( sParameterValue );
+							if( iSavevalueNumber > Constants.DEFAULT_ZERO_VALUE )
+							{
+								return GetSaveValueByNumber( iSavevalueNumber );
+							}
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+		#endregion
+
+		#region LogicSwitch Methods
+		public void AddLogicSwitch( LogicSwitch oLogicSwitch )
+		{
+			if( !String.IsNullOrEmpty( oLogicSwitch.Name ) )
+			{
+				if( GetLogicSwitchByName( oLogicSwitch.Name ) != null )
+				{
+					throw new ModelIntegrityException( "LogicSwitch with the same name already exists in the model" );
+				}
+			}
+			if( oLogicSwitch.Number != Constants.DEFAULT_ZERO_VALUE )
+			{
+				if( GetLogicSwitchByNumber( oLogicSwitch.Number ) != null )
+				{
+					throw new ModelIntegrityException( "LogicSwitch with the same number already exists in the model" );
+				}
+			}
+
+			m_oLogicSwitches.Add( oLogicSwitch );
+		}
+
+		/// <summary>
+		/// Gets LogicSwitch Entity by its Name
+		/// </summary>
+		/// <param name="sName"></param>
+		/// <returns></returns>
+		public LogicSwitch GetLogicSwitchByName( String sName )
+		{
+			LogicSwitch oLogicSwitch = ( from ls in m_oLogicSwitches
+										 where ls.Name.Equals( sName )
+										 select ls ).SingleOrDefault();
+
+			return oLogicSwitch;
+		}
+
+		/// <summary>
+		/// Gets LogicSwitch Entity by its number
+		/// </summary>
+		/// <param name="iNumber"></param>
+		/// <returns></returns>
+		public LogicSwitch GetLogicSwitchByNumber( int iNumber )
+		{
+			LogicSwitch oLogicSwitch = ( from ls in m_oLogicSwitches
+										 where ls.Number == iNumber
+										 select ls ).SingleOrDefault();
+
+			return oLogicSwitch;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
+		public List<LogicSwitch> GetLogicSwitches()
+		{
+			return m_oLogicSwitches;
+		}
+
+		/// <summary>
+		/// Clear All SaveValues in the Model
+		/// </summary>
+		public void ClearLogicSwitches()
+		{
+
+		}
+
+		/// <summary>
+		/// Reset All LogicSwitches in the Model
+		/// </summary>
+		public void ResetLogicSwitches()
+		{
+		}
+
+		/// <summary>
+		/// Removes all LogicSwitches from Model
+		/// </summary>
+		public void RemoveAllLogicSwitches()
+		{
+			m_oLogicSwitches.Clear();
+		}
+
+		/// <summary>
+		/// Returns LogicSwitches count
+		/// </summary>
+		/// <returns></returns>
+		public int LogicSwitchesCount()
+		{
+			return m_oLogicSwitches.Count;
+		}
+
+		/// <summary>
+		/// Get LogicSwitch entity by a block operand (Name, Number, SNA -TX indirect addressing-)
+		/// </summary>
+		/// <param name="oTransaction"></param>
+		/// <param name="operand"></param>
+		/// <returns></returns>
+		public LogicSwitch GetLogicSwitchFromOperands( Transaction oTransaction, BlockOperand operand )
+		{
+			if( !operand.IsEmpty )
+			{
+				if( operand.IsName )
+				{
+					String logicswitchName = String.Empty;
+					logicswitchName = operand.Name;
+					if( !String.IsNullOrEmpty( logicswitchName ) )
+					{
+						return GetLogicSwitchByName( logicswitchName );
+					}
+				}
+				else if( operand.IsPosInteger )
+				{
+					int iLogicSwitchNumber = Constants.DEFAULT_ZERO_VALUE;
+					iLogicSwitchNumber = operand.PosInteger;
+					if( iLogicSwitchNumber > Constants.DEFAULT_ZERO_VALUE )
+					{
+						return GetLogicSwitchByNumber( iLogicSwitchNumber );
+					}
+				}
+				else if( operand.IsSNA )
+				{
+					if( operand.SNA.Type == SNAType.Transaction )
+					{
+						// Transaction SNA: use Transaction to get LogicSwitch Name or Number
+						if( operand.SNA.Parameter.IsPosInteger || operand.SNA.Parameter.IsName )
+						{
+							String sParameterValue = operand.SNA.Parameter.Value;
+							int iLogicSwitchNumber = Constants.DEFAULT_ZERO_VALUE;
+							iLogicSwitchNumber = oTransaction.GetParameter( sParameterValue );
+							if( iLogicSwitchNumber > Constants.DEFAULT_ZERO_VALUE )
+							{
+								return GetLogicSwitchByNumber( iLogicSwitchNumber );
+							}
+						}
+					}
+				}
+			}
+
+			return null;
 		}
 		#endregion
 	}

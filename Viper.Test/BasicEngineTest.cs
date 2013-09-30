@@ -101,5 +101,32 @@ namespace Viper.Test
 			Trace.Write( strReport );
 		}
 
+
+		[TestMethod]
+		public void TestSimulationGenerateAdvanceTerminateWithInitialAndStorage()
+		{
+			// 1) Create basic GPSS Model
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "		INITIAL		LS1,1", Environment.NewLine );
+			strGPSSModel += String.Concat( "		INITIAL		X$PADRON,80698", Environment.NewLine );
+			strGPSSModel += String.Concat( "SALA	STORAGE		5", Environment.NewLine );
+			strGPSSModel += String.Concat( "		GENERATE	20,5", Environment.NewLine );
+			strGPSSModel += String.Concat( "		QUEUE		COLA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		DEPART		COLA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		125,25", Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE	1", Environment.NewLine );
+
+			ViperSystem.Instance().Simulate( strGPSSModel, 30 );
+
+			Assert.AreEqual( ViperSystem.Instance().TerminationCount, 0 );
+			Assert.AreNotEqual( ViperSystem.Instance().TransactionCounter, 0 );
+
+			String strReport = ViperSystem.Instance().GetFinalReport();
+
+			Trace.Write( strReport );
+		}
+
 	}
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Viper.Framework.Enums;
+using Viper.Framework.Entities;
+using Viper.Framework.Utils;
+using Viper.Framework.Exceptions;
 
 namespace Viper.Framework.Blocks
 {
@@ -78,7 +81,69 @@ namespace Viper.Framework.Blocks
 		/// <returns></returns>
 		public BlockParseResult Parse()
 		{
-			throw new NotImplementedException();
+			try
+			{
+				if( String.IsNullOrEmpty( this.Text ) )
+				{
+					OnParseFailed( new ParseEventArgs( BlockNames.ASSIGN, this.Line, String.Empty ) );
+					return BlockParseResult.PARSED_ERROR;
+				}
+
+				// Get Plain Text Block Parts
+				String[] sBlockParts = BlockFactory.GetBlockParts( this.Text );
+
+				// CORRECT SINTAX FORMAT in '[]' optional part: 
+				// [NAME]	ASSIGN	A,B[,C]
+				if( sBlockParts[ 0 ].Equals( BlockNames.ASSIGN ) && sBlockParts.Length == 2 )
+				{
+					// FORMATS:		ASSIGN A,B /	ASSIGN A,B,C
+					m_sBlockLabel = String.Empty;
+
+					String[] operands = sBlockParts[ 1 ].Split( ',' );
+
+					if( operands.Length == 0 || operands.Length == 1 || operands.Length > 3 )
+					{
+						OnParseFailed( new ParseEventArgs( BlockNames.ASSIGN, this.Line, String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
+
+					if( operands.Length >= 1 ) BlockOperand.TranslateOperand( this.OperandA, operands[ 0 ], true );
+					if( operands.Length >= 2 ) BlockOperand.TranslateOperand( this.OperandB, operands[ 1 ], true );
+					if( operands.Length >= 3 ) BlockOperand.TranslateOperand( this.OperandC, operands[ 2 ] );
+
+					// Operands A & B are required, Operand C optional, all must have valid values
+					if ( this.OperandA.HasValidValue && this.OperandB.HasValidValue && this.OperandC.HasValidValue )
+						return BlockParseResult.PARSED_OK;
+				}
+				else if( sBlockParts[ 1 ].Equals( BlockNames.ASSIGN ) && sBlockParts.Length == 3 )
+				{
+					// FORMATS: NAME ASSIGN A,B / NAME ASSIGN A,B,C
+					m_sBlockLabel = sBlockParts[ 0 ];
+
+					String[] operands = sBlockParts[ 2 ].Split( ',' );
+
+					if( operands.Length == 0 || operands.Length == 1 || operands.Length > 3 )
+					{
+						OnParseFailed( new ParseEventArgs( BlockNames.ASSIGN, this.Line, String.Empty ) );
+						return BlockParseResult.PARSED_ERROR;
+					}
+
+					if( operands.Length >= 1 ) BlockOperand.TranslateOperand( this.OperandA, operands[ 0 ], true );
+					if( operands.Length >= 2 ) BlockOperand.TranslateOperand( this.OperandB, operands[ 1 ], true );
+					if( operands.Length >= 3 ) BlockOperand.TranslateOperand( this.OperandC, operands[ 2 ] );
+
+					// Operands A & B are required, Operand C optional, all must have valid values
+					if( this.OperandA.HasValidValue && this.OperandB.HasValidValue && this.OperandC.HasValidValue )
+						return BlockParseResult.PARSED_OK;
+				}
+
+				OnParseFailed( new ParseEventArgs( BlockNames.ASSIGN, this.Line, String.Empty ) );
+			}
+			catch( Exception ex )
+			{
+				throw new BlockParseException( ex.Message, ex.InnerException, BlockNames.ASSIGN, this.Line );
+			}
+			return BlockParseResult.PARSED_ERROR;
 		}
 
 		public event EventHandler ParseSuccess;
@@ -94,6 +159,32 @@ namespace Viper.Framework.Blocks
 			if( ParseFailed != null ) ParseFailed( this, eventArgs );
 		}
 
+		#endregion
+
+		#region IProcessable Implementation
+		public override BlockProcessResult Process( ref Transaction oTransaction )
+		{
+			try
+			{
+				
+
+				// Common Process
+				base.Process( ref oTransaction );
+
+				// Notify Success
+				OnProcessSuccess( new ProcessEventArgs( BlockNames.ASSIGN, this.Line, String.Empty ) );
+
+				return BlockProcessResult.TRANSACTION_PROCESSED;
+			}
+			catch( Exception ex )
+			{
+				// Notify Fail
+				OnProcessFailed( new ProcessEventArgs( BlockNames.ASSIGN, this.Line, ex.Message ) );
+
+				// Return Exception
+				return BlockProcessResult.TRANSACTION_EXCEPTION;
+			}
+		}
 		#endregion
 	}
 }

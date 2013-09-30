@@ -177,7 +177,7 @@ namespace Viper.Framework.Blocks
 							// Add it to the CEC (with nextsystemtime, state and isdelayed updated)
 							transactionFreed.NextSystemTime = ViperSystem.Instance().SystemTime;
 							transactionFreed.State = TransactionState.WAITING;
-							transactionFreed.IsDelayed = false;
+							//transactionFreed.IsDelayed = false;
 
 							ViperSystem.Instance().InsertTransactionIntoCEC( transactionFreed );
 						}

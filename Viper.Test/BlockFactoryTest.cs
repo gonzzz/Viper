@@ -845,6 +845,30 @@ namespace Viper.Test
 		}
 
 		[TestMethod]
+		public void TestGenerateWithInitialAndStorageModelWithNoErrors()
+		{
+			String strGPSSModel = String.Empty;
+			strGPSSModel += String.Concat( "		INITIAL		X1,100", Environment.NewLine );
+			strGPSSModel += String.Concat( "		INITIAL		X$TEMP,151", Environment.NewLine );
+			strGPSSModel += String.Concat( "SALA	STORAGE		10", Environment.NewLine );
+			strGPSSModel += String.Concat( "		GENERATE	120,30", Environment.NewLine );
+			strGPSSModel += String.Concat( "		ENTER		SALON", Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		15,2", Environment.NewLine );
+			strGPSSModel += String.Concat( "		QUEUE		COLA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		SEIZE		CAJA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		DEPART		COLA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		ADVANCE		20,5", Environment.NewLine );
+			strGPSSModel += String.Concat( "		RELEASE		CAJA", Environment.NewLine );
+			strGPSSModel += String.Concat( "		LEAVE		SALON", Environment.NewLine );
+			strGPSSModel += String.Concat( "		TERMINATE	1", Environment.NewLine );
+
+			List<Block> viperModel = BlockFactory.Instance().CreateModel( strGPSSModel );
+
+			Assert.IsTrue( BlockFactory.Instance().ErrorMessageLog.Count == 0 );
+		}
+
+
+		[TestMethod]
 		public void TestBlockChainNextAndPreviousIsCorrect()
 		{
 			String strGPSSModel = String.Empty;

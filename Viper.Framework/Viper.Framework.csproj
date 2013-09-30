@@ -62,8 +62,10 @@
     <Compile Include="Engine\ViperSystem.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Facility.cs" />
+    <Compile Include="Entities\LogicSwitch.cs" />
     <Compile Include="Entities\Model.cs" />
     <Compile Include="Entities\Queue.cs" />
+    <Compile Include="Entities\SaveValue.cs" />
     <Compile Include="Entities\SNAParameter.cs" />
     <Compile Include="Entities\SNATranslated.cs" />
     <Compile Include="Entities\Storage.cs" />

@@ -6,6 +6,7 @@ using Viper.Framework.Utils;
 using Viper.Framework.Blocks;
 using Viper.Framework.Entities;
 using Viper.Framework.Enums;
+using Viper.Framework.Exceptions;
 
 namespace Viper.Framework.Engine
 {
@@ -331,49 +332,146 @@ namespace Viper.Framework.Engine
 		{
 			foreach( Block block in BlocksNonTransactionals )
 			{
-				// At September/2013 i only have STORAGE
 				if( block is StorageBlock )
 				{
-					StorageBlock storageBlock = block as StorageBlock;
-					
-					// Create new Storage in Model with Storage Block parameters
-					Storage newStorage = new Storage( storageBlock.Label, Convert.ToInt32( storageBlock.OperandA.PosInteger ) );
-					Model.AddStorage( newStorage );
+					AddStorageEntityIntoModel( block );
 				}
 				else if( block is InitialBlock )
 				{
-					InitialBlock initialBlock = block as InitialBlock;
+					AddLogicSwitchOrSaveValueIntoModel( block );
+				}
+			}
+		}
 
-					if( initialBlock.OperandA.IsSNA )
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="block"></param>
+		private void AddStorageEntityIntoModel( Block block )
+		{
+			StorageBlock storageBlock = block as StorageBlock;
+
+			// Create new Storage in Model with Storage Block parameters
+			// Storage name should be block label
+			Storage newStorage = new Storage( storageBlock.Label, Convert.ToInt32( storageBlock.OperandA.PosInteger ) );
+			Model.AddStorage( newStorage );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="block"></param>
+		private void AddLogicSwitchOrSaveValueIntoModel( Block block )
+		{
+			InitialBlock initialBlock = block as InitialBlock;
+
+			if( initialBlock.OperandA.IsSNA )
+			{
+				if( initialBlock.OperandA.SNA.Type == SNAType.LogicSwitch )
+				{
+					AddLogicSwitchIntoModel( initialBlock );
+				}
+				else if( initialBlock.OperandA.SNA.Type == SNAType.SaveValue )
+				{
+					AddSaveValueIntoModel( initialBlock );
+				}
+				else if( initialBlock.OperandA.SNA.Type == SNAType.MatrixSaveValue )
+				{
+					// Initializes Matrix SaveValue entity (Matrix must have been created before this)
+					// TODO: Create Matrix Entity object before this, get element and initialize it
+					throw new NotImplementedException( "MATRIX block not implemented yet" );
+				}
+			}
+		}
+		
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="initialSNA"></param>
+		/// <param name="initialValue"></param>
+		private void AddLogicSwitchIntoModel( InitialBlock initialBlock )
+		{
+			// Get SNA in OperandA and the optional OperandB
+			SNATranslated initialSNA = initialBlock.OperandA.SNA;
+			BlockOperand initialValue = initialBlock.OperandB;
+
+			// Create and initializes new LogicSwitch in Model with Initial Block parameters
+			// Should be LSnumber or LS$name
+			LogicSwitch newLogicSwitch = new LogicSwitch();
+			if( initialSNA.Parameter.IsName )
+			{
+				// Add with Name
+				newLogicSwitch.Name = initialSNA.Parameter.Value;
+			}
+			else if( initialSNA.Parameter.IsPosInteger )
+			{
+				// Add with Number
+				newLogicSwitch.Number = Convert.ToInt32( initialSNA.Parameter.Value );
+			}
+
+			if( !initialValue.IsEmpty )
+			{
+				if( initialValue.IsPosInteger )
+				{
+					int logicSwitchValue = initialValue.PosInteger;
+					if( logicSwitchValue == 1 || logicSwitchValue == 0 )
 					{
-						SNATranslated initialSNA = initialBlock.OperandA.SNA;
-
-						if( initialSNA.Type == SNAType.LogicSwitch )
-						{
-							// Create and initializes new LogicSwitch in Model with Initial Block parameters
-							// TODO: Create LogicSwith Entity object and add it to the Model
-						}
-						else if ( initialSNA.Type == SNAType.SaveValue ) 
-						{
-							// Create and initializes new SaveValue in Model with Initial Block parameters
-							// TODO: Create SaveValue Entity object and add it to the Model
-						}
-						else if ( initialSNA.Type == SNAType.MatrixSaveValue )
-						{
-							// Initializes Matrix SaveValue entity (Matrix must have been created before this)
-							// TODO: Create Matrix Entity object before this, get element and initialize it
-						}
-						else
-						{
-							// Wrong SNA (should be handle after Parse process)
-						}
+						newLogicSwitch.State = ( logicSwitchValue == 1 ) ? true : false;
 					}
 					else
 					{
-						// Wront Initial Block (should be handle after Parse process)
+						throw new BlockIntegrityException( "LogicSwitch Entities can only be initialized with 1 or 0" );
 					}
 				}
+				else if( initialValue.IsName )
+				{
+					// TODO: Search for EQU/VARIABLE by Name
+					throw new NotImplementedException( "EQU or VARIABLE blocks not implemented yet" );
+				}
 			}
+
+			Model.AddLogicSwitch( newLogicSwitch );
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="initialSNA"></param>
+		/// <param name="initialValue"></param>
+		private void AddSaveValueIntoModel( InitialBlock initialBlock )
+		{
+			// Get SNA in OperandA and the optional OperandB
+			SNATranslated initialSNA = initialBlock.OperandA.SNA;
+			BlockOperand initialValue = initialBlock.OperandB;
+
+			// Create and initializes new SaveValue in Model with Initial Block parameters
+			// Should be Xnumber or X$name
+			SaveValue newSaveValue = new SaveValue();
+			if( initialSNA.Parameter.IsName )
+			{
+				// Add with Name
+				newSaveValue.Name = initialSNA.Parameter.Value;
+			}
+			else if( initialSNA.Parameter.IsPosInteger )
+			{
+				// Add with Number
+				newSaveValue.Number = Convert.ToInt32( initialSNA.Parameter.Value );
+			}
+
+			if( !initialValue.IsEmpty )
+			{
+				if( initialValue.IsPosInteger )
+				{
+					newSaveValue.Value = initialValue.PosInteger;
+				}
+				else if( initialValue.IsName )
+				{
+					// TODO: Search for EQU/VARIABLE by Name
+					throw new NotImplementedException( "EQU or VARIABLE blocks not implemented yet" );
+				}
+			}
+
+			Model.AddSaveValue( newSaveValue );
 		}
 
 		/// <summary>
